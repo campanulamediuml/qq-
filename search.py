@@ -47,7 +47,6 @@ def get_weather():
         weather = (city.get_text()).strip().replace('\n',' ')
         city_weather.append(weather.replace('   ',''))
     result = '\n'.join(city_weather)
-    print result
+    #print result
     return result
 
-get_weather()
