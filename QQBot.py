@@ -14,6 +14,7 @@ from HttpClient import HttpClient
 import search
 import config
 import psutil
+import platform
 
 
 start = time.time()
@@ -785,7 +786,10 @@ class group_thread(threading.Thread):
                 mem = psutil.virtual_memory()
                 mem_per = str((float(mem.free)/float(mem.total))*100)+' %'
                 cpu = str(psutil.cpu_percent())+' %'
-                answer = '运行报告概览：\n运行时间:'+run_time+'秒\ncpu负载:'+cpu+'\n内存负载:\n'+str(mem_per)
+                py_info = platform.python_version()
+                plat_info = platform.platform()
+                cpu_plt = (platform.uname())[-2]
+                answer = '运行报告概览：\n运行时间:'+run_time+'秒\ncpu负载:'+cpu+'\n内存负载:\n'+str(mem_per)+'\npython版本:'+str(py_info)+'\n运行环境:'+str(plat_info)+'\nCPU架构:'+str(cpu_plt)
                 self.reply(answer)
             else:
                 self.reply('权限不足')
