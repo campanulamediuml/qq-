@@ -544,7 +544,7 @@ class group_thread(threading.Thread):
     def shutdown(self, send_uin, content):
 
         if content == './shutdown' :
-            if send_uin in root:
+            if send_uin in config.root:
                 self.reply('日志已保存，关机中...')
                 time.sleep(1)
                 self.reply('进程结束，退出成功')
