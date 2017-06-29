@@ -37,4 +37,17 @@ def search_info(url):
         result = content.get_text()
     return result
 
-#print search_info('http://baike.baidu.com/item/福建农林大学')
+def get_weather():
+    url = 'http://www.weather.com.cn/weather/101230101.shtml'
+    page_html = get_htmlsoup(url)
+    city_list = page_html.find(class_="t clearfix")
+    city_list = city_list.find_all('li')
+    city_weather = []
+    for city in city_list:
+        weather = (city.get_text()).strip().replace('\n',' ')
+        city_weather.append(weather.replace('   ',''))
+    result = '\n'.join(city_weather)
+    print result
+    return result
+
+get_weather()

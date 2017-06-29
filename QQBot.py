@@ -552,9 +552,8 @@ class group_thread(threading.Thread):
                     return
                 if self.selfcheck(send_uin, content):
                     return
-
-
-                
+                if self.weather(content):
+                    return       
 
         else:
             logging.warning("message seq repeat detected.")
@@ -716,7 +715,7 @@ class group_thread(threading.Thread):
         try:
             if match:
                 logging.info("output about info")
-                info="人家呢~是一个开源的python学习助手~快向宝宝下命令吧~~使用./explain进行名词解释，允许管理员账号使用./learn功能提交词条，使用./search功能搜索对应的百科词条并保存，如果您学习累了，可以选择./tips命令，宝宝会给您讲笑话哦~"
+                info="人家呢~是一个采用麻省理工大学X11协议（MIT协议）的开源学习助手，开发语言是python，作者是菁菁同学（421248329）\n~快向宝宝下命令吧~~使用./explain进行名词解释，允许管理员账号使用./learn功能提交词条，使用./search功能搜索对应的百科词条并保存，如果您学习累了，可以选择./tips命令，宝宝会给您讲笑话哦~"
                 self.reply(info)
                 return True
         except Exception, e:
@@ -782,21 +781,29 @@ class group_thread(threading.Thread):
         if content == './selfcheck':
             if send_uin in config.administrator:
                 time_now = time.time()
-                run_time = str(time_now - start)
+                run_time = str(int(time_now - start))
                 mem = psutil.virtual_memory()
                 mem_per = str((float(mem.free)/float(mem.total))*100)+' %'
                 cpu = str(psutil.cpu_percent())+' %'
                 py_info = platform.python_version()
                 plat_info = platform.platform()
                 cpu_plt = (platform.uname())[-2]
-                answer = '运行报告概览：\n运行时间:'+run_time+'秒\ncpu负载:'+cpu+'\n内存负载:\n'+str(mem_per)+'\npython版本:'+str(py_info)+'\n运行环境:'+str(plat_info)+'\nCPU架构:'+str(cpu_plt)
+                answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+str(mem_per)+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
                 self.reply(answer)
             else:
                 self.reply('权限不足')
-
         return False
 
 
+    def weather(self, content):
+        if content == './weather':
+            try:
+                result = search.get_weather()
+                self.reply('接下来七天，福州的天气是：\n'+result)
+            except:
+                logging.info('获取天气信息失败……')
+
+        return False
 
 
 if __name__ == "__main__":
