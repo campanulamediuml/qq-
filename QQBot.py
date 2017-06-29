@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import re
 import random
 import json
@@ -12,6 +13,10 @@ import urllib
 from HttpClient import HttpClient
 import search
 import config
+import psutil
+
+
+start = time.time()
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -445,25 +450,30 @@ class group_thread(threading.Thread):
             self.NickList[str(t["nick"])]=int(t["uin"])
 
     def learn(self, key, value, needreply=True):
-            if key in self.replyList:
+        if key in self.replyList:
+            if value not in self.replyList[key]:
                 self.replyList[key].append(value)
             else:
-                self.replyList[key] = [value]
+                pass
+        else:
+            self.replyList[key] = [value]
 
-            if needreply:
-                self.reply("学习内容：“" + str(key) + "”成功")
-                self.save()
+        if needreply:
+            self.reply("宝宝学会“" + str(key) + "”了~")
+            self.save()
+
+        
 
     def delete(self, key, value, needreply=True):
         if key in self.replyList and self.replyList[key].count(value):
             self.replyList[key].remove(value)
             if needreply:
-                self.reply("我已经不会说" + str(value) + "了")
+                self.reply("人家忘掉 " + str(value) + " 了")
                 self.save()
-
         else:
             if needreply:
-                self.reply("没找到你说的那句话哦")
+                self.reply("咦~人家不知道你在说什么啦~")
+        
 
     def reply(self, content):
         if time.time() - self.lastreplytime < 3.0:
@@ -500,13 +510,13 @@ class group_thread(threading.Thread):
                         self.learn(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
                         logging.debug(self.replyList)
                     else:
-                        self.reply('只有管理员和超级管管理员可以添加内容')
+                        self.reply(random.choice(['人家才不学这些坏坏的知识呢！','宝宝只学主人和她的小伙伴教的知识！']))
                 if match.group(1) == 'delete':
                     if send_uin in config.root:
                         self.delete(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
                         logging.debug(self.replyList)
                     else:
-                        self.reply('权限不足哦，只有root账号可以删除内容')
+                        self.reply('只有主人能叫宝宝忘掉！╭(╯^╰)╮口亨')
 
             else:
                 if self.aboutme(content):
@@ -531,41 +541,76 @@ class group_thread(threading.Thread):
                     return
                 if self.cleanlog(send_uin, content):
                     return
+                if self.pos(send_uin, content):
+                    return
+                if self.run_script(send_uin, content):
+                    return
+                if self.checkknowledge(send_uin, content,):
+                    return
+                if self.selfcheck(send_uin, content):
+                    return
+
+
                 
 
         else:
             logging.warning("message seq repeat detected.")
         self.lastseq = seq
+
+    def run_script(self, send_uin, content):
+        pattern = re.compile(r'^(?:./)(root)(.+)')
+        match = pattern.match(content)
+        if match:
+            if send_uin in config.root:
+                self.reply('宝宝为主人执行指令呢~')
+                time.sleep(1)
+                self.reply('指令执行完毕')
+            else:
+                self.reply('你是谁！居然妄想操纵主人的电脑！biubiubiu~~')
+
+        return False
+
+    def pos(self, send_uin, content):
+        if content == './宝宝真聪明~':
+            if send_uin in config.root:
+                self.reply('谢谢主人夸奖，宝宝会更努力的！')
+            else:
+                self.reply('无事献殷勤，非奸即盗！哼！你是不是对宝宝有什么企图呀！╭(╯^╰)╮')
+        return False
     def what_can_do(self, content):
         if content == './list':
-            self.reply('指令列表：./list  ./check  ./learn  ./delete  ./deleteall  ./tips  ./search  ./explain  ./about  ./shutdown')
+            self.reply('指令列表:\n./list\n./check\n./learn\n./delete\n./deleteall\n./tips\n./search\n./explain\n./about\n./shutdown')
         return False
 
     def shutdown(self, send_uin, content):
 
         if content == './shutdown' :
             if send_uin in config.root:
-                self.reply('日志已保存，关机中...')
-                time.sleep(1)
-                self.reply('进程结束，退出成功')
+                self.reply('主人晚安哦~么么哒~')
+                self.save()
                 exit()
             else:
-                self.reply('权限不足，只有root账号可以关闭该机器人')
+                self.reply('不是主人叫我去睡觉！宝宝不去！')
 
         return False
+
 
 
     def tucao(self, content):
         pattern = re.compile(r'^(?:./)(explain)(.+)')
         match = pattern.match(content)
         if match:
+            answer = '宝宝的知识库里没有这条知识呀'
             for key in self.replyList:
-                if str(key) in match.group(2) and self.replyList[key]:
-                    rd = random.randint(0, len(self.replyList[key]) - 1)
-                    self.reply(self.replyList[key][rd])
-                    logging.info('Group Reply'+str(self.replyList[key][rd]))
-                    return True
-            return False
+                if key in match.group(2):
+                    answer = random.choice(self.replyList[key])
+                    logging.info('Group Reply'+str(answer))
+                    break
+                else:
+                    continue
+            self.reply(str(answer))
+
+        return False
 
     def repeat(self, content):
         if self.last1 == str(content) and content != '' and content != ' ':
@@ -576,13 +621,13 @@ class group_thread(threading.Thread):
         return False
 
     def save(self):
-
         try:
             with open("database.save", "w+") as savefile:
                 savefile.write(json.dumps(self.replyList))
                 savefile.close()
         except Exception, e:
             logging.error("写存档出错："+str(e))
+
     def load(self):
         try:
             with open("database.save", "r") as savefile:
@@ -593,6 +638,20 @@ class group_thread(threading.Thread):
         except Exception, e:
             logging.info("读取存档出错:"+str(e))
             print "读取存档出错:"+str(e)
+
+    def checkknowledge(self, send_uin, content,):
+        if content == './checklist':
+            if send_uin in config.root:
+                kng_list = []
+                for key in self.replyList:
+                    kng_list.append(key)
+                kng = ','.join(kng_list)
+                self.reply('宝宝现在的知识库是：'+kng)
+            else:
+                self.reply('权限不足呢~宝宝不告诉你')
+
+        return False
+
 
     def callout(self, content):
         if './tips' in content:
@@ -632,14 +691,17 @@ class group_thread(threading.Thread):
                     value = answer
                 
                 if key in self.replyList:
-                    self.replyList[key].append(value)
+                    if value not in self.replyList[key]:
+                        self.replyList[key].append(value)
+                    else:
+                        pass
                 else:
                     self.replyList[key] = [value]
 
 
                 self.save()
             except:
-                self.reply('妈呀我被打入未知领域了……')
+                self.reply('宝宝找不到这个知识呀~')
         return False
 
 
@@ -649,7 +711,7 @@ class group_thread(threading.Thread):
         try:
             if match:
                 logging.info("output about info")
-                info="这是一个开源的python学习助手,使用./explain进行名词解释，允许管理员账号使用./learn功能提交词条，使用./search功能搜索对应的百科词条并保存，如果你学习累了，可以选择./tips命令，让它讲个段子"
+                info="人家呢~是一个开源的python学习助手~快向宝宝下命令吧~~使用./explain进行名词解释，允许管理员账号使用./learn功能提交词条，使用./search功能搜索对应的百科词条并保存，如果您学习累了，可以选择./tips命令，宝宝会给您讲笑话哦~"
                 self.reply(info)
                 return True
         except Exception, e:
@@ -667,7 +729,7 @@ class group_thread(threading.Thread):
             if send_uin in config.root:
                 try:
                     logging.info("Delete all learned data for group:"+str(self.gid))
-                    info="已删除所有学习内容"
+                    info="宝宝经过努力，忘掉这些知识了呢！"
                     self.replyList.clear()
                     self.save()
                     self.reply(info)
@@ -675,7 +737,7 @@ class group_thread(threading.Thread):
                 except Exception, e:
                     logging.error("ERROR:"+str(e))
             else:
-                self.reply('权限不足，只有root可以删除信息')
+                self.reply('宝宝才不会删除这些信息呢！只有主人可以~')
         
         
         return False
@@ -687,33 +749,56 @@ class group_thread(threading.Thread):
                 count = 0
                 for key in self.replyList:
                     count += 1
-                self.reply('报告，目前总计学习了'+str(count)+'条知识')
+                self.reply('报告，宝宝学会了'+str(count)+'条知识，快夸我~')
             else:
-                self.reply('权限不足，只有管理员以上权限可以查看学习情况')
+                self.reply('只有主人和主人的小伙伴可以看宝宝学了多少知识呢~')
         return False
 
     def greet(self, send_uin, content):
         if content == './greeting':
             if send_uin in config.root:
-                self.reply('主人~您的宝宝回来惹~')
+                self.reply(random.choice(['主人~您的宝宝回来惹~','主人~宝宝想你惹','宝宝会为主人尽心尽力服务哦~']))
             else:
-                self.reply('死变态你是谁啦快滚开！')
+                self.reply(random.choice(['死变态你是谁啦，人家不认识你啦！','变态！人家还是宝宝呢！','主人说了，宝宝不能和陌生人说话！']))
         return False
 
     def cleanlog(self, send_uin, content):
         if content == './cleanlog':
             if send_uin in config.root:
                 fh = open('log.log','w')
-                print '日志清理结束'
+                print '日志清理结束呀~'
                 fh.close()
-                self.reply('日志清理完毕')
+                self.reply('日志清理结束呀~')
             else:
-                self.reply('权限不足，该操作仅限root用户')
+                self.reply('权限不足呢，只有主人才能叫宝宝清理日志~')
         return False
 
+    def selfcheck(self, send_uin, content):
+        if content == './selfcheck':
+            if send_uin in config.administrator:
+                time_now = time.time()
+                run_time = str(time_now - start)
+                mem = psutil.virtual_memory()
+                mem_per = str((float(mem.free)/float(mem.total))*100)+' %'
+                cpu = str(psutil.cpu_percent())+' %'
+                answer = '运行报告概览：\n运行时间:'+run_time+'秒\ncpu负载:'+cpu+'\n内存负载:\n'+str(mem_per)
+                self.reply(answer)
+            else:
+                self.reply('权限不足')
+
+        return False
+
+
+
+
 if __name__ == "__main__":
+
+    fh = open('log.log','w')
+    fh.close()
+
     vpath = './v.png'
     qq = 0
+
     if len(sys.argv) > 1:
         vpath = sys.argv[1]
     if len(sys.argv) > 2:
