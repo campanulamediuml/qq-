@@ -418,7 +418,9 @@ class check_msg(threading.Thread):
             'r': '{{"ptwebqq":"{1}","clientid":{2},"psessionid":"{0}","key":""}}'.format(PSessionID, PTWebQQ, ClientID)
         }, httpsReferer)
         logging.info("Check html: " + str(html))
-        print str(html)
+        content_txt = json.loads(str(html))
+        value = (((content_txt['result'])[0])['value'])
+        print str(time.asctime(time.localtime(time.time()))),'\n','group_code =',value['group_code'],' ','send_uin =',value['send_uin'],' ','content =',value['content'][-1],'\n'
 
         try:
             ret = json.loads(html)
@@ -600,6 +602,7 @@ class group_thread(threading.Thread):
         pattern = re.compile(r'^(?:./)(explain)(.+)')
         match = pattern.match(content)
         if match:
+            self.load()
             answer = '宝宝的知识库里没有这条知识呀'
             for key in self.replyList:
                 if key in match.group(2):
@@ -642,6 +645,7 @@ class group_thread(threading.Thread):
     def checkknowledge(self, send_uin, content,):
         if content == './checklist':
             if send_uin in config.root:
+                self.load()
                 kng_list = []
                 for key in self.replyList:
                     kng_list.append(key)
