@@ -688,3 +688,34 @@ Fri, 30 Jun 2017 14:46:21  QQBot.py[line:453] INFO Check html: {"result":[{"poll
 Fri, 30 Jun 2017 14:46:21  QQBot.py[line:184] INFO 群线程已生成
 Fri, 30 Jun 2017 14:46:21  QQBot.py[line:453] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"还是不知道是什么家伙如此无聊"],"from_uin":2703760211,"group_code":2703760211,"msg_id":10296,"msg_type":4,"send_uin":2755654079,"time":1498805163,"to_uin":1420539145}}],"retcode":0}
 Fri, 30 Jun 2017 14:46:23  QQBot.py[line:184] INFO 群线程已生成
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:242] CRITICAL 正在获取登陆页面
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:245] CRITICAL 正在获取appid
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:247] CRITICAL 正在获取login_sig
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:249] INFO get sign : 
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:250] CRITICAL 正在获取pt_version
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:252] INFO get g_pt_version : 10224
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:253] CRITICAL 正在获取mibao_css
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:255] INFO get g_mibao_css : 
+Fri, 30 Jun 2017 17:45:31  PngImagePlugin.py[line:130] DEBUG STREAM 'IHDR' 16 13
+Fri, 30 Jun 2017 17:45:31  PngImagePlugin.py[line:130] DEBUG STREAM 'pHYs' 41 9
+Fri, 30 Jun 2017 17:45:31  PngImagePlugin.py[line:130] DEBUG STREAM 'IDAT' 62 424
+Fri, 30 Jun 2017 17:45:31  QQBot.py[line:266] INFO [1] Get QRCode Picture Success.
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:280] INFO ['ptuiCB(', '0', ',', '0', ',', 'http://ptlogin2.web2.qq.com/check_sig?pttype=1&uin=1420539145&service=ptqrlogin&nodirect=0&ptsigx=2e88c326f146a84393e377eadaea8a6066a1946b2159f4207b37dd0fba45189f2e4e9dc3a5adf344466a3ec3337d49aee11f685bc083845ef2c1bbabfef9dccc&s_url=http%3A%2F%2Fw.qq.com%2Fproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&f_url=&ptlang=2052&ptredirect=100&aid=501004106&daid=164&j_later=0&low_login_hour=0&regmaster=0&pt_login_type=3&pt_aid=0&pt_aaid=16&pt_light=0&pt_3rd_aid=0', ',', '0', ',', '\xe7\x99\xbb\xe5\xbd\x95\xe6\x88\x90\xe5\x8a\x9f\xef\xbc\x81', ', ', '\xe5\xb0\x8f\xe5\xb0\x8f\xe6\x99\xa8\xe6\x98\x9f', ');\r\n']
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:284] CRITICAL 二维码已扫描，正在登陆
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:110] ERROR Get mibao_res Url Error.
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:302] INFO PTWebQQ: 0125ae1f1e39e7c7b6c3aca419d6e516584966d6f70ad663a55a065be9c05e9d
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:312] INFO getvfwebqq html:  {"retcode":0,"result":{"vfwebqq":"d2afb4467c42b6872fabf01aaeb04d5904d8788411b50dad060950b0916e5bba786dd3932dc56e72"}}
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:326] CRITICAL QQ号：1420539145 登陆成功, 用户名：小小晨星
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:327] INFO Login success
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:328] CRITICAL 登陆二维码用时0.328秒
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:349] INFO 添加管理员账号成功
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:346] INFO 添加root账号成功
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:559] INFO 关注:亲爱的瓜皮
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:559] INFO 关注:都是朋友啊
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:559] INFO 关注:17生科，深刻等你
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:559] INFO 关注:荒野公学
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:559] INFO 关注:王者荣耀-苟富贵勿相
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:559] INFO 关注:福建农林大学17新生群
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:561] ERROR 无法找到群：搏击长空 风暴特工队
+Fri, 30 Jun 2017 17:45:38  QQBot.py[line:561] ERROR 无法找到群：一地野合小菊花
+Fri, 30 Jun 2017 17:45:39  QQBot.py[line:418] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"莫奈"],"from_uin":451451770,"group_code":451451770,"msg_id":8151,"msg_type":4,"send_uin":2620990675,"time":1498815753,"to_uin":1420539145}}],"retcode":0}

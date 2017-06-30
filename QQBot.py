@@ -15,11 +15,10 @@ import search
 import psutil
 import platform
 from PIL import Image
-
-
+import method
+import imp
 
 start = time.time()
-
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -344,7 +343,11 @@ class Login(HttpClient):
             if name['markname'] == 'Root管理者':
                 root.append(name['uin'])
                 administrator.append(name['uin'])
+                logging.info('添加root账号成功')
+            elif name['markname'] == '管理员':
+                administrator.append(name['uin'])
                 logging.info('添加管理员账号成功')
+
         #获取root账号
 
         if ret['retcode']!= 0:
@@ -425,54 +428,19 @@ class check_msg(threading.Thread):
             return self.check()
 
         return ret
+
 class group_thread(threading.Thread):
-    global root
-    global administrator
-    last1 = ''
-    lastseq = 0
-    replyList = {}
-    followList = []
-    NickList = {}
-
-    # 属性
-    repeatPicture = True
-
     def __init__(self, guin, gcode):
         threading.Thread.__init__(self)
         self.guin = guin
         self.gid = gcode
-        self.load()
+        method.load()
         self.lastreplytime=0
         ret = HttpClient_Ist.Get('http://s.web2.qq.com/api/get_group_info_ext2?gcode={0}&vfwebqq={1}&t={2}'.format(gcode,VFWebQQ,get_ts()),Referer)
         ret = json.loads(ret)
         for t in ret['result']['minfo']:
             self.NickList[str(t["nick"])]=int(t["uin"])
 
-    def learn(self, key, value, needreply=True):
-        if key in self.replyList:
-            if value not in self.replyList[key]:
-                self.replyList[key].append(value)
-            else:
-                pass
-        else:
-            self.replyList[key] = [value]
-
-        if needreply:
-            self.reply("宝宝学会“" + str(key) + "”了~")
-            self.save()
-
-        
-
-    def delete(self, key, value, needreply=True):
-        if key in self.replyList and self.replyList[key].count(value):
-            self.replyList[key].remove(value)
-            if needreply:
-                self.reply("人家忘掉 " + str(value) + " 了")
-                self.save()
-        else:
-            if needreply:
-                self.reply("咦~人家不知道你在说什么啦~")
-        
 
     def reply(self, content):
         if time.time() - self.lastreplytime < 3.0:
@@ -498,365 +466,7 @@ class group_thread(threading.Thread):
         logging.error("[Fail to reply group " + str(self.gid)+ "]:" + str(rsp))
         return rsp
 
-    def handle(self, send_uin, content, seq):
-        # 避免重复处理相同信息
-        if seq != self.lastseq:
-            pattern = re.compile(r'^(?:./|./)(learn|delete) {(.+)}{(.+)}')
-            match = pattern.match(content)
-            if match:
-                if match.group(1) == 'learn':
-                    if send_uin in administrator:
-                        self.learn(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
-                        logging.debug(self.replyList)
-                    else:
-                        self.reply(random.choice(['人家才不学这些坏坏的知识呢！','宝宝只学主人和她的小伙伴教的知识！']))
-                if match.group(1) == 'delete':
-                    if send_uin in root:
-                        self.delete(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
-                        logging.debug(self.replyList)
-                    else:
-                        self.reply('只有主人能叫宝宝忘掉！╭(╯^╰)╮口亨')
-
-            else:
-                if self.aboutme(content):
-                    return
-                if self.deleteall(send_uin,content):
-                    return
-                if self.callout(content):
-                    return
-                if self.tucao(content):
-                    return
-                if self.repeat(content):
-                    return
-                if self.search(content):
-                    return
-                if self.shutdown(send_uin, content):
-                    return
-                if self.checklength(send_uin,content):
-                    return
-                if self.greet(send_uin, content):
-                    return
-                if self.what_can_do(content):
-                    return
-                if self.cleanlog(send_uin, content):
-                    return
-                if self.pos(send_uin, content):
-                    return
-                if self.run_script(send_uin, content):
-                    return
-                if self.checkknowledge(send_uin, content,):
-                    return
-                if self.selfcheck(send_uin, content):
-                    return
-                if self.weather(content):
-                    return 
-                if self.add_admin(send_uin, content):
-                    return
-                if self.add_root(send_uin, content):
-                    return
-                if self.check_admins(send_uin, content):  
-                    return 
-                if self.add_tips(send_uin, content):   
-                    return
-
-        else:
-            logging.warning("message seq repeat detected.")
-        self.lastseq = seq
-
-    def run_script(self, send_uin, content):
-        pattern = re.compile(r'^(?:./)(root)(.+)')
-        match = pattern.match(content)
-        if match:
-            if send_uin in root:
-                self.reply('宝宝为主人执行指令呢~')
-                time.sleep(1)
-                self.reply('指令执行完毕')
-            else:
-                self.reply('你是谁！居然妄想操纵主人的电脑！biubiubiu~~')
-
-        return False
-
-    def pos(self, send_uin, content):
-        if content == './宝宝真聪明~':
-            if send_uin in root:
-                self.reply('谢谢主人夸奖，宝宝会更努力的！')
-            else:
-                self.reply('无事献殷勤，非奸即盗！哼！你是不是对宝宝有什么企图呀！╭(╯^╰)╮')
-        return False
-    def what_can_do(self, content):
-        if content == './list':
-            self.reply('指令列表:\n./list\n./check\n./learn\n./delete\n./deleteall\n./tips\n./search\n./explain\n./about\n./shutdown')
-        return False
-
-    def shutdown(self, send_uin, content):
-
-        if content == './shutdown' :
-            if send_uin in root:
-                self.reply('主人晚安哦~么么哒~')
-                self.save()
-                exit()
-            else:
-                self.reply('不是主人叫我去睡觉！宝宝不去！')
-        return False
-
-    def tucao(self, content):
-        pattern = re.compile(r'^(?:./)(explain)(.+)')
-        match = pattern.match(content)
-        if match:
-            self.load()
-            answer = '宝宝的知识库里没有这条知识呀'
-            for key in self.replyList:
-                if key in match.group(2):
-                    answer = random.choice(self.replyList[key])
-                    logging.info('Group Reply'+str(answer))
-                    break
-                else:
-                    continue
-            self.reply(str(answer))
-
-        return False
-
-    def repeat(self, content):
-        if self.last1 == str(content) and content != '' and content != ' ':
-            self.reply(content)
-            return True
-        self.last1 = content
-
-        return False
-
-    def save(self):
-        try:
-            with open("database.save", "w+") as savefile:
-                savefile.write(json.dumps(self.replyList))
-                savefile.close()
-        except Exception, e:
-            logging.error("写存档出错："+str(e))
-
-    def load(self):
-        try:
-            with open("database.save", "r") as savefile:
-                saves = savefile.read()
-                if saves:
-                    self.replyList = json.loads(saves)
-                savefile.close()
-        except Exception, e:
-            logging.info("读取存档出错:"+str(e))
-            print "读取存档出错:"+str(e)
-
-    def checkknowledge(self, send_uin, content,):
-        if content == './checklist':
-            if send_uin in root:
-                self.load()
-                kng_list = []
-                for key in self.replyList:
-                    kng_list.append(key)
-                kng = ','.join(kng_list)
-                self.reply('宝宝现在的知识库是：'+kng)
-            else:
-                self.reply('权限不足呢~宝宝不告诉你')
-
-        return False
-
-
-    def callout(self, content):
-        global joke_list
-        if './tips' in content:
-            try:
-                joke_index = content.split()[1]
-                logging.info('开始讲笑话了')
-                joke = joke_list[joke_index]
-            except:
-                joke = random.choice(joke_list)
-                    
-            logging.info("AI REPLY:"+str(joke))
-            print "AI REPLY:"+str(joke)
-            self.reply(joke)
-
-        return False
-
-    def search(self, content):
-        pattern = re.compile(r'^(?:./)(search) (.+)')
-        match = pattern.match(content)
-        if match:
-            logging.info('SEARCH:'+content+'\n')
-            url = 'http://baike.baidu.com/item/'+match.group(2)
-            key = match.group(2)
-            try:
-                answer = (search.search_info(url)).strip()
-                try:
-                    self.reply(answer[:150]+'...')
-                except:
-                    self.reply(answer)
-                try:
-                    value = answer[:150]
-                except:
-                    value = answer
-                
-                if key in self.replyList:
-                    if value not in self.replyList[key]:
-                        self.replyList[key].append(value)
-                    else:
-                        pass
-                else:
-                    self.replyList[key] = [value]
-                self.save()
-            except:
-                self.reply('宝宝找不到这个知识呀~')
-        return False
-
-
-    def aboutme(self, content):
-        pattern = re.compile(r'^(?:./|./)(about)')
-        match = pattern.match(content)
-        try:
-            if match:
-                logging.info("output about info")
-                info="人家呢~是一个采用麻省理工大学X11协议（MIT协议）的开源学习助手，开发语言是python，作者是菁菁同学（421248329）\n~快向宝宝下命令吧~~使用./explain进行名词解释，允许管理员账号使用./learn功能提交词条，使用./search功能搜索对应的百科词条并保存，如果您学习累了，可以选择./tips命令，宝宝会给您讲笑话哦~"
-                self.reply(info)
-                return True
-        except Exception, e:
-            logging.error("ERROR"+str(e))
-        return False
-
-
-    def deleteall(self, send_uin, content):
     
-        pattern = re.compile(r'^(?:./|./)(deleteall)')
-        match = pattern.match(content)
-        
-        if match:
-
-            if send_uin in root:
-                try:
-                    logging.info("Delete all learned data for group:"+str(self.gid))
-                    info="宝宝经过努力，忘掉这些知识了呢！"
-                    self.replyList.clear()
-                    self.save()
-                    self.reply(info)
-                    return True
-                except Exception, e:
-                    logging.error("ERROR:"+str(e))
-            else:
-                self.reply('宝宝才不会删除这些信息呢！只有主人可以~')
-        
-        
-        return False
-
-    def checklength(self, send_uin, content):
-
-        if content == './check':
-            if send_uin in administrator:
-                count = 0
-                for key in self.replyList:
-                    count += 1
-                self.reply('报告，宝宝学会了'+str(count)+'条知识，快夸我~')
-            else:
-                self.reply('只有主人和主人的小伙伴可以看宝宝学了多少知识呢~')
-        return False
-
-    def greet(self, send_uin, content):
-        if content == './greeting':
-            if send_uin in root:
-                self.reply(random.choice(['主人~您的宝宝回来惹~','主人~宝宝想你惹','宝宝会为主人尽心尽力服务哦~']))
-            else:
-                self.reply(random.choice(['死变态你是谁啦，人家不认识你啦！','变态！人家还是宝宝呢！','主人说了，宝宝不能和陌生人说话！']))
-        return False
-
-    def cleanlog(self, send_uin, content):
-        if content == './cleanlog':
-            if send_uin in root:
-                fh = open('log.log','w')
-                print '日志清理结束呀~'
-                fh.close()
-                self.reply('日志清理结束呀~')
-            else:
-                self.reply('权限不足呢，只有主人才能叫宝宝清理日志~')
-        return False
-
-    def selfcheck(self, send_uin, content):
-        if content == './selfcheck':
-            if send_uin in administrator:
-                time_now = time.time()
-                run_time = str(int(time_now - start))
-                mem = psutil.virtual_memory()
-                mem_per = str((float(mem.free)/float(mem.total))*100)+' %'
-                cpu = str(psutil.cpu_percent())+' %'
-                py_info = platform.python_version()
-                plat_info = platform.platform()
-                cpu_plt = (platform.uname())[-2]
-                answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+str(mem_per)+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
-                self.reply(answer)
-            else:
-                self.reply('权限不足')
-        return False
-
-
-    def weather(self, content):
-        if content == './weather':
-            try:
-                result = search.get_weather()
-                self.reply('接下来七天，福州的天气是：\n'+result)
-            except:
-                logging.info('获取天气信息失败……')
-        return False
-
-    def add_admin(self, send_uin, content):
-        if './add_admin' in content:
-            if send_uin in root:
-                try:
-                    administrator.append(int(content.split()[1]))
-                    self.reply('添加'+str((content.split())[1])+'管理员成功！')
-                except:
-                    logging.info('添加'+str((content.split())[1])+'失败')
-                    self.reply('添加失败，详情请查看日志')
-            else:
-                self.reply('权限不足')
-
-        return False
-
-    def add_root(self, send_uin, content):
-        if './add_root' in content:
-            if send_uin in root:
-                try:
-                    root.append(int(content.split()[1]))
-                    administrator.append(int(content.split()[1]))
-                    self.reply('添加'+str((content.split())[1])+'root权限成功！')
-                except:
-                    logging.info('添加'+str((content.split())[1])+'失败')
-                    self.reply('添加失败，详情请查看日志')
-            else:
-                self.reply('权限不足')
-
-        return False
-
-    def check_admins(self, send_uin, content):
-        global administrator
-        if content == './check_admins':
-            if send_uin in administrator:
-                administrator = list(set(administrator))
-                answer = str(administrator)
-                self.reply('现在管理员账号列表为：'+answer)
-            else:
-                self.reply('权限不足')
-
-        return False
-
-    def add_tips(self, send_uin, content):
-        global joke_list
-        global administrator
-        if './add_tip' in content:
-            if send_uin in administrator:
-                fh = open('Advts.r','a')
-                text_inside = (content.split())[1]
-                joke_list.append(text_inside)
-                fh.write(text_inside)
-                fh.close()
-                self.reply('成功写入内容')
-            else:
-                self.reply('权限不足，无法写入')
-
-        return False
-
 
 
 if __name__ == "__main__":
