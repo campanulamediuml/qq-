@@ -379,11 +379,12 @@ class Login(HttpClient):
         f_l = json.loads(friend_list)
         if f_l['retcode']!= 0:
             raise ValueError, "retcode error when getting friend list: retcode="+str(ret['retcode'])
-        for name in f_l['result']['info']:
-            if name['nick'] == root_nick:
+        for name in f_l['result']['marknames']:
+            if name['marknames'] == 'Root管理者':
                 root.append(name['uin'])
                 administrator.append(name['uin'])
                 logging.info('添加管理员账号成功')
+        #获取root账号
 
         if ret['retcode']!= 0:
             raise ValueError, "retcode error when getting group list: retcode="+str(ret['retcode'])
