@@ -40,9 +40,6 @@ SmartQQUrl = 'https://ui.ptlogin2.qq.com/cgi-bin/login?daid=164&target=self&styl
 root_nick = '希尔伯特的晨星'
 root = []
 administrator = []
-file_handle = open('Advts.r','r')
-joke_list = file_handle.readlines()
-file_handle.close()
 
 initTime = time.time()
 
@@ -428,19 +425,22 @@ class check_msg(threading.Thread):
             return self.check()
 
         return ret
-
 class group_thread(threading.Thread):
+    global root
+    global administrator
+    lastseq = 0
+    replyList = {}
+    NickList = {}
+
     def __init__(self, guin, gcode):
         threading.Thread.__init__(self)
         self.guin = guin
         self.gid = gcode
-        method.load()
         self.lastreplytime=0
         ret = HttpClient_Ist.Get('http://s.web2.qq.com/api/get_group_info_ext2?gcode={0}&vfwebqq={1}&t={2}'.format(gcode,VFWebQQ,get_ts()),Referer)
         ret = json.loads(ret)
         for t in ret['result']['minfo']:
-            self.NickList[str(t["nick"])]=int(t["uin"])
-
+            self.NickList[str(t["nick"])]=int(t["uin"])      
 
     def reply(self, content):
         if time.time() - self.lastreplytime < 3.0:
@@ -466,7 +466,89 @@ class group_thread(threading.Thread):
         logging.error("[Fail to reply group " + str(self.gid)+ "]:" + str(rsp))
         return rsp
 
-    
+    def handle(self, send_uin, content, seq):
+        global administrator
+        global root
+        # 避免重复处理相同信息 
+        if seq != self.lastseq:
+
+            #主方法中包含修改权限操作
+            if content == './reload':
+                try:
+                    imp.reload(method)
+                    self.reply('更新指令库成功')
+                except Exception, e:
+                    logging.critical(str(e))
+                    self.reply('指令库更新失败，请查看日志')
+            #重新加载方法
+
+            elif content == './selfcheck':
+                if send_uin in administrator:
+                    time_now = time.time()
+                    run_time = str(int(time_now - start))
+                    mem = psutil.virtual_memory()
+                    mem_per = str((float(mem.free)/float(mem.total))*100)+' %'
+                    cpu = str(psutil.cpu_percent())+' %'
+                    py_info = platform.python_version()
+                    plat_info = platform.platform()
+                    cpu_plt = (platform.uname())[-2]
+                    answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+str(mem_per)+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
+                    self.reply(answer)
+                else:
+                    self.reply('权限不足')
+            #查看运行状态
+
+
+            elif './add_admin' in content:
+                if send_uin in root:
+                    try:
+                        administrator.append(int(content.split()[1]))
+                        self.reply('添加'+str((content.split())[1])+'管理员成功！')
+                    except:
+                        logging.info('添加'+str((content.split())[1])+'失败')
+                        self.reply('添加失败，详情请查看日志')
+                else:
+                    self.reply('权限不足')
+            #添加管理员名单
+
+
+            elif './add_root' in content:
+                if send_uin in root:
+                    try:
+                        root.append(int(content.split()[1]))
+                        administrator.append(int(content.split()[1]))
+                        self.reply('添加'+str((content.split())[1])+'root权限成功！')
+                    except:
+                        logging.info('添加'+str((content.split())[1])+'失败')
+                        self.reply('添加失败，详情请查看日志')
+                else:
+                    self.reply('权限不足')
+            #添加root名单
+
+
+            elif content == './check_admins':
+                if send_uin in administrator:
+                    administrator = list(set(administrator))
+                    answer = str(administrator)
+                    self.reply('现在管理员账号列表为：'+answer)
+                else:
+                    self.reply('权限不足')
+            #查看管理员名单
+
+
+            else:
+                try:
+                    answer = method.main(send_uin, content, root, administrator)
+                    if answer ='不是主人叫我去睡觉！宝宝不去！':
+                        exit()
+                    else:
+                        self.reply(answer) 
+                except:
+                    pass   
+        else:
+            logging.warning("message seq repeat detected.")
+
+        self.lastseq = seq
 
 
 if __name__ == "__main__":
