@@ -12,10 +12,9 @@ import logging
 import urllib
 from HttpClient import HttpClient
 import search
-import config
 import psutil
 import platform
-import qrcode_terminal
+from PIL import Image
 
 
 start = time.time()
@@ -38,10 +37,9 @@ PSessionID = ''
 Referer = 'http://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1'
 httpsReferer = 'https://d1.web2.qq.com/cfproxy.html?v=20151105001&callback=1'
 SmartQQUrl = 'https://ui.ptlogin2.qq.com/cgi-bin/login?daid=164&target=self&style=16&mibao_css=m_webqq&appid=501004106&enable_qlogin=0&no_verifyimg=1&s_url=http%3A%2F%2Fw.qq.com%2Fproxy.html&f_url=loginerroralert&strong_login=1&login_state=10&t=20131024001'
-VFWebQQ = ''
-AdminQQ = '0'
-MyUIN = ''
-
+root_nick = '希尔伯特的晨星'
+root = []
+administrator = []
 
 initTime = time.time()
 
@@ -124,36 +122,36 @@ def msg_handler(msgObj):
         msgType = msg['poll_type']
 
         # QQ私聊消息
-        if msgType == 'message' or msgType == 'sess_message':  # 私聊 or 临时对话
-            txt = combine_msg(msg['value']['content'])
-            tuin = msg['value']['from_uin']
-            msg_id = msg['value']['msg_id']
+        # if msgType == 'message' or msgType == 'sess_message':  # 私聊 or 临时对话
+        #     txt = combine_msg(msg['value']['content'])
+        #     tuin = msg['value']['from_uin']
+        #     msg_id = msg['value']['msg_id']
 
-            # print "{0}:{1}".format(from_account, txt)
-            targetThread = thread_exist(tuin)
-            if targetThread:
-                targetThread.push(txt, msg_id)
-            else:
-                try:
-                    service_type = 0
-                    isSess = 0
-                    group_sig = ''
-                    if msgType == 'sess_message':
-                        isSess = 1
-                        service_type = msg['value']['service_type']
-                        myid = msg['value']['id']
-                        info = json.loads(HttpClient_Ist.Get('http://d1.web2.qq.com/channel/get_c2cmsg_sig2?id={0}&to_uin={1}&clientid={2}&psessionid={3}&service_type={4}&t={5}'.format(myid, tuin, ClientID, PSessionID, service_type, get_ts()), Referer))
-                        logging.info("Get group sig:" + str(info))
-                        if info['retcode'] != 0:
-                            raise ValueError, info
-                        info = info['result']
-                        group_sig = info['value']
-                    tmpThread = pmchat_thread(tuin,isSess,group_sig,service_type)
-                    tmpThread.start()
-                    ThreadList.append(tmpThread)
-                    tmpThread.push(txt,msg_id)
-                except Exception, e:
-                    logging.info("error"+str(e))
+        #     # print "{0}:{1}".format(from_account, txt)
+        #     targetThread = thread_exist(tuin)
+        #     if targetThread:
+        #         targetThread.push(txt, msg_id)
+        #     else:
+        #         try:
+        #             service_type = 0
+        #             isSess = 0
+        #             group_sig = ''
+        #             if msgType == 'sess_message':
+        #                 isSess = 1
+        #                 service_type = msg['value']['service_type']
+        #                 myid = msg['value']['id']
+        #                 info = json.loads(HttpClient_Ist.Get('http://d1.web2.qq.com/channel/get_c2cmsg_sig2?id={0}&to_uin={1}&clientid={2}&psessionid={3}&service_type={4}&t={5}'.format(myid, tuin, ClientID, PSessionID, service_type, get_ts()), Referer))
+        #                 logging.info("Get group sig:" + str(info))
+        #                 if info['retcode'] != 0:
+        #                     raise ValueError, info
+        #                 info = info['result']
+        #                 group_sig = info['value']
+        #             tmpThread = pmchat_thread(tuin,isSess,group_sig,service_type)
+        #             tmpThread.start()
+        #             ThreadList.append(tmpThread)
+        #             tmpThread.push(txt,msg_id)
+        #         except Exception, e:
+                    # logging.info("error"+str(e))
 
             # print "{0}:{1}".format(self.FriendList.get(tuin, 0), txt)
 
@@ -256,13 +254,29 @@ def group_thread_exist(gid):
 # -----------------
 # 类声明
 # -----------------
+class ShowQRcode:
+    def __init__(self, image, width=33, height=33):
+        self.image = image
+        self.width = width
+        self.height = height
+
+    def show(self):
+        im = Image.open(self.image)
+        im = im.resize((self.width, self.height), Image.NEAREST)
+        text = ''
+        for w in range(self.width):
+            for h in range(self.height):
+                res = im.getpixel((h, w))
+                text += '  ' if res == 0 else '██'
+            text += '\n'
+        return text
 
 
 class Login(HttpClient):
     MaxTryTime = 5
 
     def __init__(self, vpath, qq=0):
-        global APPID, AdminQQ, PTWebQQ, VFWebQQ, PSessionID, msgId, MyUIN, GroupNameList, tmpUserName, GroupCodeList
+        global APPID, AdminQQ, PTWebQQ, VFWebQQ, PSessionID, msgId, MyUIN, GroupNameList, tmpUserName, GroupCodeList, root, administrator
         self.VPath = vpath  # QRCode保存路径
         AdminQQ = int(qq)
         logging.critical("正在获取登陆页面")
@@ -286,7 +300,7 @@ class Login(HttpClient):
             T = T + 1
             log_qr_code = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid={0}&e=0&l=M&s=5&d=72&v=4&t=0.0836106{1}4250{2}6653'.format(APPID,random.randint(0,9),random.randint(0,9))
             self.Download(log_qr_code, self.VPath)
-            qrcode_terminal.draw(log_qr_code)
+            print ShowQRcode('v.png').show()
 
 
             logging.info('[{0}] Get QRCode Picture Success.'.format(T))
@@ -358,6 +372,19 @@ class Login(HttpClient):
                 'r': '{{"vfwebqq":"{0}","hash":"{1}"}}'.format(str(VFWebQQ),gethash(str(MyUIN),str(PTWebQQ)))
             }, Referer)
         ret = json.loads(html)
+
+        friend_list = self.Post('http://s.web2.qq.com/api/get_user_friends2', {
+                'r': '{{"vfwebqq":"{0}","hash":"{1}"}}'.format(str(VFWebQQ),gethash(str(MyUIN),str(PTWebQQ)))
+            }, Referer)
+        f_l = json.loads(friend_list)
+        if f_l['retcode']!= 0:
+            raise ValueError, "retcode error when getting friend list: retcode="+str(ret['retcode'])
+        for name in f_l['result']['info']:
+            if name['nick'] == root_nick:
+                root.append(name['uin'])
+                administrator.append(name['uin'])
+                logging.info('添加管理员账号成功')
+
         if ret['retcode']!= 0:
             raise ValueError, "retcode error when getting group list: retcode="+str(ret['retcode'])
         for t in ret['result']['gnamelist']:
@@ -437,6 +464,8 @@ class check_msg(threading.Thread):
 
         return ret
 class group_thread(threading.Thread):
+    global root
+    global administrator
     last1 = ''
     lastseq = 0
     replyList = {}
@@ -514,13 +543,13 @@ class group_thread(threading.Thread):
             match = pattern.match(content)
             if match:
                 if match.group(1) == 'learn':
-                    if send_uin in config.administrator:
+                    if send_uin in administrator:
                         self.learn(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
                         logging.debug(self.replyList)
                     else:
                         self.reply(random.choice(['人家才不学这些坏坏的知识呢！','宝宝只学主人和她的小伙伴教的知识！']))
                 if match.group(1) == 'delete':
-                    if send_uin in config.root:
+                    if send_uin in root:
                         self.delete(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
                         logging.debug(self.replyList)
                     else:
@@ -558,7 +587,13 @@ class group_thread(threading.Thread):
                 if self.selfcheck(send_uin, content):
                     return
                 if self.weather(content):
-                    return       
+                    return 
+                if self.add_admin(send_uin, content):
+                    return
+                if self.add_root(send_uin, content):
+                    return
+                if self.check_admins(send_uin, content):  
+                    return    
 
         else:
             logging.warning("message seq repeat detected.")
@@ -568,7 +603,7 @@ class group_thread(threading.Thread):
         pattern = re.compile(r'^(?:./)(root)(.+)')
         match = pattern.match(content)
         if match:
-            if send_uin in config.root:
+            if send_uin in root:
                 self.reply('宝宝为主人执行指令呢~')
                 time.sleep(1)
                 self.reply('指令执行完毕')
@@ -579,7 +614,7 @@ class group_thread(threading.Thread):
 
     def pos(self, send_uin, content):
         if content == './宝宝真聪明~':
-            if send_uin in config.root:
+            if send_uin in root:
                 self.reply('谢谢主人夸奖，宝宝会更努力的！')
             else:
                 self.reply('无事献殷勤，非奸即盗！哼！你是不是对宝宝有什么企图呀！╭(╯^╰)╮')
@@ -592,16 +627,13 @@ class group_thread(threading.Thread):
     def shutdown(self, send_uin, content):
 
         if content == './shutdown' :
-            if send_uin in config.root:
+            if send_uin in root:
                 self.reply('主人晚安哦~么么哒~')
                 self.save()
                 exit()
             else:
                 self.reply('不是主人叫我去睡觉！宝宝不去！')
-
         return False
-
-
 
     def tucao(self, content):
         pattern = re.compile(r'^(?:./)(explain)(.+)')
@@ -649,7 +681,7 @@ class group_thread(threading.Thread):
 
     def checkknowledge(self, send_uin, content,):
         if content == './checklist':
-            if send_uin in config.root:
+            if send_uin in root:
                 self.load()
                 kng_list = []
                 for key in self.replyList:
@@ -706,8 +738,6 @@ class group_thread(threading.Thread):
                         pass
                 else:
                     self.replyList[key] = [value]
-
-
                 self.save()
             except:
                 self.reply('宝宝找不到这个知识呀~')
@@ -735,7 +765,7 @@ class group_thread(threading.Thread):
         
         if match:
 
-            if send_uin in config.root:
+            if send_uin in root:
                 try:
                     logging.info("Delete all learned data for group:"+str(self.gid))
                     info="宝宝经过努力，忘掉这些知识了呢！"
@@ -754,7 +784,7 @@ class group_thread(threading.Thread):
     def checklength(self, send_uin, content):
 
         if content == './check':
-            if send_uin in config.administrator:
+            if send_uin in administrator:
                 count = 0
                 for key in self.replyList:
                     count += 1
@@ -765,7 +795,7 @@ class group_thread(threading.Thread):
 
     def greet(self, send_uin, content):
         if content == './greeting':
-            if send_uin in config.root:
+            if send_uin in root:
                 self.reply(random.choice(['主人~您的宝宝回来惹~','主人~宝宝想你惹','宝宝会为主人尽心尽力服务哦~']))
             else:
                 self.reply(random.choice(['死变态你是谁啦，人家不认识你啦！','变态！人家还是宝宝呢！','主人说了，宝宝不能和陌生人说话！']))
@@ -773,7 +803,7 @@ class group_thread(threading.Thread):
 
     def cleanlog(self, send_uin, content):
         if content == './cleanlog':
-            if send_uin in config.root:
+            if send_uin in root:
                 fh = open('log.log','w')
                 print '日志清理结束呀~'
                 fh.close()
@@ -784,7 +814,7 @@ class group_thread(threading.Thread):
 
     def selfcheck(self, send_uin, content):
         if content == './selfcheck':
-            if send_uin in config.administrator:
+            if send_uin in administrator:
                 time_now = time.time()
                 run_time = str(int(time_now - start))
                 mem = psutil.virtual_memory()
@@ -807,14 +837,51 @@ class group_thread(threading.Thread):
                 self.reply('接下来七天，福州的天气是：\n'+result)
             except:
                 logging.info('获取天气信息失败……')
+        return False
+
+    def add_admin(self, send_uin, content):
+        if './add_admin' in content:
+            if send_uin in root:
+                try:
+                    administrator.append(int(content.split()[1]))
+                    self.reply('添加'+str((content.split())[1])+'管理员成功！')
+                except:
+                    logging.info('添加'+str((content.split())[1])+'失败')
+                    self.reply('添加失败，详情请查看日志')
+            else:
+                self.reply('权限不足')
+
+        return False
+
+    def add_root(self, send_uin, content):
+        if './add_root' in content:
+            if send_uin in root:
+                try:
+                    root.append(int(content.split()[1]))
+                    administrator.append(int(content.split()[1]))
+                    self.reply('添加'+str((content.split())[1])+'root权限成功！')
+                except:
+                    logging.info('添加'+str((content.split())[1])+'失败')
+                    self.reply('添加失败，详情请查看日志')
+            else:
+                self.reply('权限不足')
+
+        return False
+
+    def check_admins(self, send_uin, content):
+        global administrator
+        if content == './check_admins':
+            if send_uin in administrator:
+                administrator = list(set(administrator))
+                answer = str(administrator)
+                self.reply('现在管理员账号列表为：'+answer)
+            else:
+                self.reply('权限不足')
 
         return False
 
 
 if __name__ == "__main__":
-
-    fh = open('log.log','w')
-    fh.close()
 
     vpath = './v.png'
     qq = 0
@@ -844,6 +911,7 @@ if __name__ == "__main__":
                     logging.error("无法找到群："+str(tmp))
     except Exception, e:
         logging.error("读取组存档出错:"+str(e))
-
+    print administrator
+    print root
 
     t_check.join()
