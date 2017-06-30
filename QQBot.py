@@ -17,6 +17,7 @@ import platform
 from PIL import Image
 
 
+
 start = time.time()
 
 reload(sys)
@@ -40,6 +41,9 @@ SmartQQUrl = 'https://ui.ptlogin2.qq.com/cgi-bin/login?daid=164&target=self&styl
 root_nick = '希尔伯特的晨星'
 root = []
 administrator = []
+file_handle = open('Advts.r','r')
+joke_list = file_handle.readlines()
+file_handle.close()
 
 initTime = time.time()
 
@@ -120,50 +124,6 @@ def date_to_millis(d):
 def msg_handler(msgObj):
     for msg in msgObj:
         msgType = msg['poll_type']
-
-        # QQ私聊消息
-        # if msgType == 'message' or msgType == 'sess_message':  # 私聊 or 临时对话
-        #     txt = combine_msg(msg['value']['content'])
-        #     tuin = msg['value']['from_uin']
-        #     msg_id = msg['value']['msg_id']
-
-        #     # print "{0}:{1}".format(from_account, txt)
-        #     targetThread = thread_exist(tuin)
-        #     if targetThread:
-        #         targetThread.push(txt, msg_id)
-        #     else:
-        #         try:
-        #             service_type = 0
-        #             isSess = 0
-        #             group_sig = ''
-        #             if msgType == 'sess_message':
-        #                 isSess = 1
-        #                 service_type = msg['value']['service_type']
-        #                 myid = msg['value']['id']
-        #                 info = json.loads(HttpClient_Ist.Get('http://d1.web2.qq.com/channel/get_c2cmsg_sig2?id={0}&to_uin={1}&clientid={2}&psessionid={3}&service_type={4}&t={5}'.format(myid, tuin, ClientID, PSessionID, service_type, get_ts()), Referer))
-        #                 logging.info("Get group sig:" + str(info))
-        #                 if info['retcode'] != 0:
-        #                     raise ValueError, info
-        #                 info = info['result']
-        #                 group_sig = info['value']
-        #             tmpThread = pmchat_thread(tuin,isSess,group_sig,service_type)
-        #             tmpThread.start()
-        #             ThreadList.append(tmpThread)
-        #             tmpThread.push(txt,msg_id)
-        #         except Exception, e:
-                    # logging.info("error"+str(e))
-
-            # print "{0}:{1}".format(self.FriendList.get(tuin, 0), txt)
-
-            # if FriendList.get(tuin, 0) == AdminQQ:#如果消息的发送者与AdminQQ不相同, 则忽略本条消息不往下继续执行
-            #     if txt[0] == '#':
-            #         thread.start_new_thread(self.runCommand, (tuin, txt[1:].strip(), msgId))
-            #         msgId += 1
-
-            # if txt[0:4] == 'exit':
-            #     logging.info(self.Get('http://d1.web2.qq.com/channel/logout2?ids=&clientid={0}&psessionid={1}'.format(self.ClientID, self.PSessionID), Referer))
-            #     exit(0)
-
         # 群消息
         if msgType == 'group_message':
             global GroupWatchList
@@ -232,6 +192,7 @@ def send_msg(tuin, content, isSess, group_sig, service_type):
             logging.error("reply temp pmchat error"+str(rspp['errCode']))
 
     return rsp
+#登录用
 
 
 def thread_exist(tuin):
@@ -380,7 +341,7 @@ class Login(HttpClient):
         if f_l['retcode']!= 0:
             raise ValueError, "retcode error when getting friend list: retcode="+str(ret['retcode'])
         for name in f_l['result']['marknames']:
-            if name['marknames'] == 'Root管理者':
+            if name['markname'] == 'Root管理者':
                 root.append(name['uin'])
                 administrator.append(name['uin'])
                 logging.info('添加管理员账号成功')
@@ -594,7 +555,9 @@ class group_thread(threading.Thread):
                 if self.add_root(send_uin, content):
                     return
                 if self.check_admins(send_uin, content):  
-                    return    
+                    return 
+                if self.add_tips(send_uin, content):   
+                    return
 
         else:
             logging.warning("message seq repeat detected.")
@@ -696,10 +659,8 @@ class group_thread(threading.Thread):
 
 
     def callout(self, content):
+        global joke_list
         if './tips' in content:
-            fh = open('Advts.r','r')
-            joke_list = fh.readlines()
-            joke = random.choice(joke_list)
             try:
                 joke_index = content.split()[1]
                 logging.info('开始讲笑话了')
@@ -710,7 +671,6 @@ class group_thread(threading.Thread):
             logging.info("AI REPLY:"+str(joke))
             print "AI REPLY:"+str(joke)
             self.reply(joke)
-            fh.close()
 
         return False
 
@@ -880,6 +840,23 @@ class group_thread(threading.Thread):
                 self.reply('权限不足')
 
         return False
+
+    def add_tips(self, send_uin, content):
+        global joke_list
+        global administrator
+        if './add_tip' in content:
+            if send_uin in administrator:
+                fh = open('Advts.r','a')
+                text_inside = (content.split())[1]
+                joke_list.append(text_inside)
+                fh.write(text_inside)
+                fh.close()
+                self.reply('成功写入内容')
+            else:
+                self.reply('权限不足，无法写入')
+
+        return False
+
 
 
 if __name__ == "__main__":
