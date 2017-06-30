@@ -15,6 +15,7 @@ import search
 import config
 import psutil
 import platform
+import qrcode_terminal
 
 
 start = time.time()
@@ -281,8 +282,12 @@ class Login(HttpClient):
         StarTime = date_to_millis(datetime.datetime.utcnow())
         T = 0
         while True:
+
             T = T + 1
-            self.Download('https://ssl.ptlogin2.qq.com/ptqrshow?appid={0}&e=0&l=M&s=5&d=72&v=4&t=0.0836106{1}4250{2}6653'.format(APPID,random.randint(0,9),random.randint(0,9)), self.VPath)
+            log_qr_code = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid={0}&e=0&l=M&s=5&d=72&v=4&t=0.0836106{1}4250{2}6653'.format(APPID,random.randint(0,9),random.randint(0,9))
+            self.Download(log_qr_code, self.VPath)
+            qrcode_terminal.draw(log_qr_code)
+
 
             logging.info('[{0}] Get QRCode Picture Success.'.format(T))
 

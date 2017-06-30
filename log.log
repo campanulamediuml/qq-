@@ -1,50 +1,12 @@
-Thu, 29 Jun 2017 19:48:42  QQBot.py[line:258] CRITICAL 正在获取登陆页面
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:261] CRITICAL 正在获取appid
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:263] CRITICAL 正在获取login_sig
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:265] INFO get sign : 
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:266] CRITICAL 正在获取pt_version
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:268] INFO get g_pt_version : 10222
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:269] CRITICAL 正在获取mibao_css
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:271] INFO get g_mibao_css : 
-Thu, 29 Jun 2017 19:48:43  QQBot.py[line:278] INFO [1] Get QRCode Picture Success.
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:292] INFO ['ptuiCB(', '0', ',', '0', ',', 'http://ptlogin2.web2.qq.com/check_sig?pttype=1&uin=1420539145&service=ptqrlogin&nodirect=0&ptsigx=2d7551e7ed106a2cd25f9a9d8df883e0b0a16f71e2c1f6360e0ba0bc1e2eb37cd0acc036ba9cc23251ad732fbdd7c3a01c4b03c36027d9a55abf5f389ccec381&s_url=http%3A%2F%2Fw.qq.com%2Fproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&f_url=&ptlang=2052&ptredirect=100&aid=501004106&daid=164&j_later=0&low_login_hour=0&regmaster=0&pt_login_type=3&pt_aid=0&pt_aaid=16&pt_light=0&pt_3rd_aid=0', ',', '0', ',', '\xe7\x99\xbb\xe5\xbd\x95\xe6\x88\x90\xe5\x8a\x9f\xef\xbc\x81', ', ', '\xe5\xb0\x8f\xe5\xb0\x8f\xe6\x99\xa8\xe6\x98\x9f', ');\r\n']
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:296] CRITICAL 二维码已扫描，正在登陆
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:99] ERROR Get mibao_res Url Error.
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:314] INFO PTWebQQ: 78e7375aabb4887674cd15d5fcaeedc5106ebdc960778091ef743f513fc171ad
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:324] INFO getvfwebqq html:  {"retcode":0,"result":{"vfwebqq":"d6bae056c03a10652e446b8095fdcd6f7bce3487fa756add7b4a61ecc8fd1024eb517a0358d75241"}}
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:338] CRITICAL QQ号：1420539145 登陆成功, 用户名：小小晨星
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:339] INFO Login success
-Thu, 29 Jun 2017 19:48:56  QQBot.py[line:340] CRITICAL 登陆二维码用时0.367秒
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:890] INFO 关注:亲爱的瓜皮
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:890] INFO 关注:都是朋友啊
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:890] INFO 关注:17生科，深刻等你
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:890] INFO 关注:荒野公学
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:890] INFO 关注:王者荣耀-苟富贵勿相
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:890] INFO 关注:福建农林大学17新生群
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:892] ERROR 无法找到群：搏击长空 风暴特工队
-Thu, 29 Jun 2017 19:48:57  QQBot.py[line:892] ERROR 无法找到群：一地野合小菊花
-Thu, 29 Jun 2017 19:49:04  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"."],"from_uin":4054839345,"group_code":4054839345,"msg_id":25333,"msg_type":4,"send_uin":2169611622,"time":1498736944,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:49:05  QQBot.py[line:176] INFO 群线程已生成
-Thu, 29 Jun 2017 19:49:11  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"test"],"from_uin":2169611622,"msg_id":13457,"msg_type":1,"time":1498736951,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:49:44  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}]],"from_uin":4054839345,"group_code":4054839345,"msg_id":53015,"msg_type":4,"send_uin":245055153,"time":1498736984,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:50:44  QQBot.py[line:412] INFO Check html: {"errmsg":"error","retcode":0}
-Thu, 29 Jun 2017 19:50:45  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"这是什么"],"from_uin":4054839345,"group_code":4054839345,"msg_id":5255,"msg_type":4,"send_uin":3535486212,"time":1498737046,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:51:19  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"@无",""," 是吖是吖，男朋友好"],"from_uin":4054839345,"group_code":4054839345,"msg_id":45562,"msg_type":4,"send_uin":4024890038,"time":1498737079,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:52:19  QQBot.py[line:412] INFO Check html: {"errmsg":"error","retcode":0}
-Thu, 29 Jun 2017 19:52:27  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],["face",0]],"from_uin":4054839345,"group_code":4054839345,"msg_id":29562,"msg_type":4,"send_uin":1005362396,"time":1498737147,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:52:27  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}]],"from_uin":4054839345,"group_code":4054839345,"msg_id":6963,"msg_type":4,"send_uin":2968423305,"time":1498737147,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:52:35  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}]],"from_uin":4054839345,"group_code":4054839345,"msg_id":15148,"msg_type":4,"send_uin":3330872139,"time":1498737155,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:52:47  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"rec 1134616991"],"from_uin":4054839345,"group_code":4054839345,"msg_id":15149,"msg_type":4,"send_uin":3330872139,"time":1498737167,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:52:57  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"rcd 1134616991"],"from_uin":4054839345,"group_code":4054839345,"msg_id":15150,"msg_type":4,"send_uin":3330872139,"time":1498737177,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:52:57  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"cardDefend succedd！"],"from_uin":4054839345,"group_code":4054839345,"msg_id":6971,"msg_type":4,"send_uin":2968423305,"time":1498737177,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:52:57  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"removeCardDefend success！"],"from_uin":4054839345,"group_code":4054839345,"msg_id":6973,"msg_type":4,"send_uin":2968423305,"time":1498737177,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:53:57  QQBot.py[line:412] INFO Check html: {"errmsg":"error","retcode":0}
-Thu, 29 Jun 2017 19:54:05  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"1134616991[14-物流-皮卡猪]将群名片更改为:14-物"],"from_uin":4054839345,"group_code":4054839345,"msg_id":6993,"msg_type":4,"send_uin":2968423305,"time":1498737245,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:54:06  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"皮皮猪我们走"],"from_uin":4054839345,"group_code":4054839345,"msg_id":29564,"msg_type":4,"send_uin":1005362396,"time":1498737246,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:54:14  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"照相"],"from_uin":4054839345,"group_code":4054839345,"msg_id":15143,"msg_type":4,"send_uin":3166252412,"time":1498737254,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:54:33  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"咋啦"],"from_uin":4054839345,"group_code":4054839345,"msg_id":15155,"msg_type":4,"send_uin":3330872139,"time":1498737273,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:54:36  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"玩啥呢"],"from_uin":4054839345,"group_code":4054839345,"msg_id":15144,"msg_type":4,"send_uin":3166252412,"time":1498737276,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:54:43  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],["face",0]],"from_uin":4054839345,"group_code":4054839345,"msg_id":45583,"msg_type":4,"send_uin":4024890038,"time":1498737283,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:54:51  QQBot.py[line:412] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"。。。怎么又是了"],"from_uin":4054839345,"group_code":4054839345,"msg_id":45584,"msg_type":4,"send_uin":4024890038,"time":1498737291,"to_uin":1420539145}}],"retcode":0}
-Thu, 29 Jun 2017 19:55:51  QQBot.py[line:412] INFO Check html: {"errmsg":"error","retcode":0}
-Thu, 29 Jun 2017 19:56:51  QQBot.py[line:412] INFO Check html: {"errmsg":"error","retcode":0}
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:268] CRITICAL 正在获取登陆页面
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:271] CRITICAL 正在获取appid
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:273] CRITICAL 正在获取login_sig
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:275] INFO get sign : 
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:276] CRITICAL 正在获取pt_version
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:278] INFO get g_pt_version : 10222
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:279] CRITICAL 正在获取mibao_css
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:281] INFO get g_mibao_css : 
+Fri, 30 Jun 2017 12:32:31  QQBot.py[line:292] INFO [1] Get QRCode Picture Success.
+Fri, 30 Jun 2017 12:34:25  QQBot.py[line:301] INFO ['ptuiCB(', '65', ',', '0', ',', '', ',', '0', ',', '\xe4\xba\x8c\xe7\xbb\xb4\xe7\xa0\x81\xe5\xb7\xb2\xe5\xa4\xb1\xe6\x95\x88\xe3\x80\x82(532688542)', ', ', '', ');\r\n']
+Fri, 30 Jun 2017 12:34:25  QQBot.py[line:826] CRITICAL list indices must be integers, not str
+Fri, 30 Jun 2017 12:34:34  QQBot.py[line:292] INFO [2] Get QRCode Picture Success.
