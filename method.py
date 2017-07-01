@@ -5,40 +5,27 @@ import time
 import random
 import search
 import re
+import sqlite3
+import os
 
-fh = open('Advts.txt','r')
-sleeptime = 0.5
-joke_list = fh.readlines()
-fh.close()
+conn = sqlite3.connect("qq_bot_database.db")
+cu = conn.cursor()
+
+try:
+    cu.execute("create table learn_data (id integer primary key,pid integer UNIQUE ,name varchar(140) ,content text NULL)")
+except:
+    print 'table exists..'
+
+sleeptime = 0.1
 logging.basicConfig(filename='log.log', level=logging.DEBUG, format='%(asctime)s  %(filename)s[line:%(lineno)d] %(levelname)s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
-knowledge = {}
 last1 = ''
 administrator = []
 root = []
 
-def save():
-    try:
-        fh = open('database.save','w')
-        fh.write(json.dumps(knowledge))
-        fh.close()
-    except Exception, e:
-        logging.error("写存档出错："+str(e))
-
-def load():
-    global knowledge
-    try:
-        fh = open('database.save','r')
-        saves = fh.read()
-        knowledge = json.loads(saves)
-        fh.close()
-    except Exception, e:
-        logging.info("读取存档出错:"+str(e))
-        print "读取存档出错:"+str(e)
 
 
 def main(send_uin, content, root_name, admini):
     global last1
-    global knowledge
     global administrator
     global root
     administrator = admini
@@ -48,18 +35,20 @@ def main(send_uin, content, root_name, admini):
     pattern = re.compile(r'^(?:./|./)(learn|delete) {(.+)}{(.+)}')
     match = pattern.match(content)
     if match:
-        if match.group(1) == 'learn':
-            if send_uin in administrator:
-                result = learn(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
-                logging.debug(knowledge)
-            else:
-                result = random.choice(['人家才不学这些坏坏的知识呢！','宝宝只学主人和她的小伙伴教的知识！'])
-        elif match.group(1) == 'delete':
-            if send_uin in root:
-                result = delete(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))
-                logging.debug(knowledge)
-            else:
-                result = '只有主人能叫宝宝忘掉！╭(╯^╰)╮口亨'
+        try:
+            if match.group(1) == 'learn':
+                if send_uin in administrator:
+                    result = learn(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))    
+                else:
+                    result = random.choice(['人家才不学这些坏坏的知识呢！','宝宝只学主人和她的小伙伴教的知识！'])
+            
+            elif match.group(1) == 'delete':
+                if send_uin in root:
+                    result = delete(str(match.group(2)).decode('UTF-8'), str(match.group(3)).decode('UTF-8'))   
+                else:
+                    result = '只有主人能叫宝宝忘掉！╭(╯^╰)╮口亨'
+        except Exception,e:
+            logging.critical(str(e))
         
     else:
         try:
@@ -71,7 +60,6 @@ def main(send_uin, content, root_name, admini):
 
 
 def command(send_uin, content):
-    global knowledge
     if './add_tip' in content:
         result = add_tip(send_uin,content)
                 
@@ -89,17 +77,26 @@ def command(send_uin, content):
         try:
             joke_index = content.split()[1]
             logging.info('开始讲笑话了')
-            result = joke_list[int(joke_index)]
+            try:
+                joke_index = int(joke_index)
+                cu.execute("select * from tips_data where id ="+str(joke_index))
+                result = cu.fetchall()
+                result = result[0][-1]
+            except Exception,e:
+                logging.critical(str(e))
+                cu.execute("select * from tips_data where content like '%"+str(joke_index)+"%'")
+                result = cu.fetchall()
+                result = (random.choice(result))[-1]
         except:
-            result = random.choice(joke_list)
-                
+            cu.execute("select * from tips_data")
+            result = cu.fetchall()
+            result = (random.choice(result))[-1]     
         logging.info("AI REPLY:"+str(result))
 
 
     elif './search' in content:
         result = search_nlg(content)
-        return result
-
+        
 
     elif content == './about':
         try:
@@ -109,25 +106,19 @@ def command(send_uin, content):
             logging.error("ERROR"+str(e))
 
 
-    elif content.split()[0] == './root':
-        if send_uin in root:
-            result = '宝宝为主人执行指令呢~'
-        else:
-            result = '你是谁！居然妄想操纵主人的电脑！biubiubiu~~'
-
-
     elif content == './list':
         result ='指令列表:\n./list\n./check\n./learn\n./delete\n./deleteall\n./tips\n./search\n./explain\n./about\n./shutdown'
 
 
     elif content == './checklist':
         if send_uin in root:
-            load()
-            kng_list = []
-            for key in knowledge:
-                kng_list.append(key)
-            kng = ','.join(kng_list)
-            result = '宝宝现在的知识库是：'+kng
+            cu.execute("select * from learn_data")
+            all_know = cu.fetchall()
+            kng = []
+            for i in all_know:
+                kng.append(i[2])
+            kng=list(set(kng))            
+            result = '宝宝现在的知识库是：'+','.join(kng)
         else:
             result = '权限不足呢~宝宝不告诉你'
 
@@ -136,11 +127,8 @@ def command(send_uin, content):
         if send_uin in root:
             try:
                 logging.info("Delete all learned data for group")
-                result="宝宝经过努力，忘掉这些知识了呢！"
-                knowledge = {}
-                fh = open('database.save','w')
-                fh.close()
-                save()
+                cu.execute("delete from learn_data")
+                result = "宝宝经过努力，忘掉这些知识了呢！"
             except Exception, e:
                 logging.error("ERROR:"+str(e))
         else:
@@ -149,9 +137,9 @@ def command(send_uin, content):
 
     elif content == './check':
         if send_uin in administrator:
-            count = 0
-            for key in knowledge:
-                count += 1
+            cu.execute("select * from learn_data")
+            count = len(cu.fetchall())
+
             result = '报告，宝宝学会了'+str(count)+'条知识，快夸我~'
         else:
             result ='只有主人和主人的小伙伴可以看宝宝学了多少知识呢~'
@@ -178,26 +166,27 @@ def command(send_uin, content):
 
     else:
         content = content[2:]
-        load()
-        answer = '宝宝的知识库里没有这条知识呀'
-        for key in knowledge:
-            if content in key:
-                answer = random.choice(knowledge[key])
-                logging.info('Group Reply'+str(answer))
-                break
-            else:
-                continue
+        print content
+        try:
+            cu.execute("select * from learn_data where name like'%"+content+"%'")
+            answer = cu.fetchall()
+            answer = (random.choice(answer))[-1]
+            result = answer
+        except Exception, e:
+            answer = '宝宝的知识库里没有这条知识呀'
+            logging.error("ERROR:"+str(e))
+            pass
         if answer == '宝宝的知识库里没有这条知识呀':
-            answer = search_nlg('./search '+content)
-        result = str(answer)
-
-
+            try:
+                answer = search_nlg('./search '+content)
+            except:
+                pass
+            result = str(answer)
+    
     return result
 
 
 def search_nlg(content):
-    global knowledge
-    load()
     logging.info('SEARCH:'+content+'\n')
     url = 'http://baike.baidu.com/item/'+content.split()[1]
     key = content.split()[1]
@@ -211,57 +200,53 @@ def search_nlg(content):
             value = answer[:150]
         except:
             value = answer
-    
-        if key in knowledge:
-            if value not in knowledge[key]:
-                knowledge[key].append(value)
-            else:
-                pass
-        else:
-            knowledge[key] = [value]
-        save()
-    except:
+        learn(key,value)
+    except Exception, e:
+        logging.critical('ERROR'+str(e))
         result = '宝宝找不到这个知识呀~'
     return result
 
 def delete(key, value, needreply=True):
-    global knowledge
-    if key in knowledge and knowledge.count(value):
-        knowledge[key].remove(value)
+    try:
+        cu.execute("delete from learn_data where name = '"+str(key)+"' and content = '"+str(value)+"'")  
+        conn.commit() 
         if needreply:
             result = "人家忘掉 " + str(value) + " 了"
-    else:
-        if needreply:
+    except:
             result = "咦~人家不知道你在说什么啦~"
-    
-    save()
+
     return result
 
 def learn(key, value, needreply=True):
-    global knowledge
-    if key in knowledge:
-        if value not in knowledge[key]:
-            knowledge[key].append(value)
-        else:
-            pass
-    else:
-        knowledge[key] = [value]
+    try:
+        cu.execute("select * from learn_data where name = '"+str(key)+"'")
+        result = cu.fetchall()
+        result_index = []
+        for i in result:
+            result_index.append(i[3:])
+            print i[3:]  
+            print i      
+        result_index = list(set(result_index))
 
-    if needreply:
-        result = ("宝宝学会“" + str(key) + "”了~")    
-    save()
+        t = (key.decode('utf-8'),value.decode('utf-8'))
+        print t
+        if value not in result_index:
+            cu.execute("insert into learn_data (name,content)  values(?,?)", t)
+        conn.commit()
+        result = ("宝宝学会“" + str(key) + "”了~") 
+    except Exception,e:
+        logging.critical('ERROR'+str(e))
+
+    
     return result
 
 def add_tip(send_uin,content):
     global joke_list
     if './add_tip' in content:
         if send_uin in administrator:
-            fh = open('Advts.txt','a')
-            text_inside = (content.split())[1]
-            joke_list.append(text_inside)
-            fh.write(text_inside+'\n')
-            fh.close()
-            result = '成功写入内容'
+            cu.execute("insert into tips_data (content) values(?)",((content.split()[1]),))
+            result = '该tip成功写入数据库'
+            conn.commit()
         else:
             result = '权限不足，无法写入'
         logging.info(result)
@@ -273,13 +258,13 @@ def roll(content):
     except:
         diceface = 20
 
-    if diceface == 0:
+    if diceface is 0:
         result = '你拿出一颗祖传的克莱因瓶骰子，结果它直接消失在了空气中。'
     elif diceface < 0:
         result = '你尝试丢%d个面的骰子的行为被未来局时空管理处制止了。' % int(diceface)
-    elif diceface == 1:
+    elif diceface is 1:
         result = '你发现自己正盯着一个写着阿拉伯数字 1 的莫比乌斯环发呆。'
-    elif diceface == 2:
+    elif diceface is 2:
         diceresult = random.randint(0,1)
         result = '你向空中抛出一枚硬币，结果是：%s' % ( u'正面(1)' if diceresult else u'反面(2)' )
     elif diceface <= 1024:
@@ -292,6 +277,4 @@ def roll(content):
 
     return result
 
-
-load()      
 

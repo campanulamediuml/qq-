@@ -476,7 +476,6 @@ class group_thread(threading.Thread):
                 #主方法中包含修改权限操作
                 if content == './reload':
                     try:
-                        method.save()
                         self.reply('正在编译新的指令')
                         imp.reload(method)
                         self.reply('成功编译完成')
@@ -519,6 +518,15 @@ class group_thread(threading.Thread):
                         self.reply('权限不足')
                 #添加管理员名单
 
+                elif content.split()[0] == './root':
+                    if send_uin in root:
+                        command_line = ' '.join(content.split()[1:])
+                        self.reply('宝宝为主人执行指令呢~')
+                        time.sleep(2)
+                        self.reply('指令执行完毕')
+                    else:
+                        self.reply('你是谁！居然妄想操纵主人的电脑！biubiubiu~~')
+
 
                 elif './add_root' in content:
                     if send_uin in root:
@@ -545,7 +553,6 @@ class group_thread(threading.Thread):
 
                 elif content == './shutdown':
                     if send_uin in root:
-                        method.save()
                         self.reply('晚安~宝宝要睡觉惹~~')
                         time.sleep(1)
                         self.reply('正在保存日志')
