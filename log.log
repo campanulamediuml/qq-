@@ -978,3 +978,15 @@ Sat, 01 Jul 2017 15:53:07  QQBot.py[line:415] INFO Check html: {"result":[{"poll
 Sat, 01 Jul 2017 15:53:09  QQBot.py[line:415] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}]],"from_uin":1226379715,"group_code":1226379715,"msg_id":21731,"msg_type":4,"send_uin":3922599135,"time":1498895570,"to_uin":1420539145}}],"retcode":0}
 Sat, 01 Jul 2017 15:53:23  QQBot.py[line:415] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}],"不知道这个是什么"],"from_uin":1226379715,"group_code":1226379715,"msg_id":21732,"msg_type":4,"send_uin":3922599135,"time":1498895585,"to_uin":1420539145}}],"retcode":0}
 Sat, 01 Jul 2017 15:53:29  QQBot.py[line:415] INFO Check html: {"result":[{"poll_type":"group_message","value":{"content":[["font",{"color":"000000","name":"微软雅黑","size":10,"style":[0,0,0]}]],"from_uin":1226379715,"group_code":1226379715,"msg_id":21733,"msg_type":4,"send_uin":3922599135,"time":1498895591,"to_uin":1420539145}}],"retcode":0}
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:239] CRITICAL 正在获取登陆页面
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:242] CRITICAL 正在获取appid
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:244] CRITICAL 正在获取login_sig
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:246] INFO get sign : 
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:247] CRITICAL 正在获取pt_version
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:249] INFO get g_pt_version : 10224
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:250] CRITICAL 正在获取mibao_css
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:252] INFO get g_mibao_css : 
+Sat, 01 Jul 2017 19:44:41  PngImagePlugin.py[line:130] DEBUG STREAM 'IHDR' 16 13
+Sat, 01 Jul 2017 19:44:41  PngImagePlugin.py[line:130] DEBUG STREAM 'pHYs' 41 9
+Sat, 01 Jul 2017 19:44:41  PngImagePlugin.py[line:130] DEBUG STREAM 'IDAT' 62 425
+Sat, 01 Jul 2017 19:44:41  QQBot.py[line:263] INFO [1] Get QRCode Picture Success.

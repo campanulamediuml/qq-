@@ -490,16 +490,12 @@ class group_thread(threading.Thread):
                         time_now = time.time()
                         run_time = str(int(time_now - start))
                         mem = psutil.virtual_memory()
-                        mem_per = (float(mem.free)/float(mem.total))*100
-                        if mem_per - float(int(mem_per)) > 0.5:
-                            mem_per = str(int(mem_per)+1)+' %'
-                        else:
-                            men_per = str(int(mem_per))+' %'
+                        mem_per = str(1-(float(mem.free)/float(mem.total))*100)+' %'
                         cpu = str(psutil.cpu_percent())+' %'
                         py_info = platform.python_version()
                         plat_info = platform.platform()
                         cpu_plt = (platform.uname())[-2]
-                        answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+str(mem_per)+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
+                        answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+mem_per+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
                         self.reply(answer)
                     else:
                         self.reply('权限不足')
@@ -537,6 +533,17 @@ class group_thread(threading.Thread):
                         except:
                             logging.info('添加'+str((content.split())[1])+'失败')
                             self.reply('添加失败，详情请查看日志')
+                    else:
+                        self.reply('权限不足')
+
+                elif './remove_admin' in content:
+                    if send_uin in root:
+                        try:
+                            administrator.remove(int(content.split()[1]))
+                            self.reply('删除'+str((content.split())[1])+'管理员权限成功！')
+                        except Exception,e:
+                            logging.info(str(e))
+                            self.reply('删除失败，详情请查看日志')
                     else:
                         self.reply('权限不足')
                 #添加root名单

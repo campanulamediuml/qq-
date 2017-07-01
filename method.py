@@ -21,6 +21,7 @@ logging.basicConfig(filename='log.log', level=logging.DEBUG, format='%(asctime)s
 last1 = ''
 administrator = []
 root = []
+bot_document = '管理员专用指令：\n./selfcheck(自检）\n./learn '+'{'+'关键词}'+'{内'+'容}\n./check（查看已经学会多少知识）\n./add_tip xxx（向tip中添加内容）\n'
 
 
 
@@ -107,7 +108,10 @@ def command(send_uin, content):
 
 
     elif content == './list':
-        result ='指令列表:\n./list\n./check\n./learn\n./delete\n./deleteall\n./tips\n./search\n./explain\n./about\n./shutdown'
+        result ='指令列表:\n./list\n./check\n./learn\n./delete\n./deleteall\n./tips\n./search\n./about\n./shutdown'
+
+    elif content == './document':
+        result = bot_document
 
 
     elif content == './checklist':
