@@ -364,22 +364,28 @@ class check_msg(threading.Thread):
         E = 0
         # 心跳包轮询
         while 1:
-            if E > 5:
+            if E > 20:
                 break
             try:
                 ret = self.check()
-            except:
+            except Exception,e:
                 E += 1
+                logging.critical(str(e))
+                print str(e)
                 continue
             # logging.info(ret)
 
             # 返回数据有误
             if ret == "":
-                E += 1
+                #E += 1
+                logging.critical('无返回数据')
+                print '无返回数据'
                 continue
 
             # POST数据有误
             if ret['retcode'] == 100006:
+                logging.critical('ERROR 100006')
+                print 'ERROR 100006'
                 break
 
             # 无消息
@@ -399,12 +405,17 @@ class check_msg(threading.Thread):
                     msg_handler(ret['result'])
                 E = 0
                 continue
-
+            else:
             # Other retcode e.g.: 103
-            E += 1
+                E += 1
+                if E > 5:
+                    logging.critical('ERROR 103')
+                    break
+
             HttpClient_Ist.Get('http://d1.web2.qq.com/channel/get_online_buddies2?vfwebqq={0}&clientid={1}&psessionid={2}&t={3}'.format(VFWebQQ,ClientID,PSessionID,get_ts()),Referer)
 
-        logging.critical("轮询错误超过五次")
+        logging.critical("轮询错误超过20次")
+        print "轮询错误超过20次"
 
     # 向服务器查询新消息
     def check(self):
@@ -490,7 +501,7 @@ class group_thread(threading.Thread):
                         time_now = time.time()
                         run_time = str(int(time_now - start))
                         mem = psutil.virtual_memory()
-                        mem_per = str(1-(float(mem.free)/float(mem.total))*100)+' %'
+                        mem_per = str((1-(float(mem.free)/float(mem.total)))*100)+' %'
                         cpu = str(psutil.cpu_percent())+' %'
                         py_info = platform.python_version()
                         plat_info = platform.platform()
