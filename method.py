@@ -168,6 +168,25 @@ def command(send_uin, content):
         result = roll(content) 
 
 
+    elif './executesql' in content:
+        if send_uin in root:
+            content = content.split()
+            content = ' '.join(content[1:])
+            try:
+                cu.execute(content)
+                result = '操作成功'
+            except Exception,e:
+                logging.critical(str(e))
+                result = '操作失败'
+                print result
+
+        else:
+            result = '权限不足呢，只有主人才能操作SQL数据库~'
+
+    elif './roll' in content:
+        result = roll(content) 
+
+
     else:
         content = content[2:]
         print content
