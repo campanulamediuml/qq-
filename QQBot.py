@@ -24,6 +24,7 @@ sys.setdefaultencoding("utf-8")
 
 HttpClient_Ist = HttpClient()
 
+last1 = ''
 ClientID = 53999199
 PTWebQQ = ''
 APPID = 0
@@ -320,6 +321,7 @@ class Login(HttpClient):
         VFWebQQ = ret2['result']['vfwebqq']
         PSessionID = ret['result']['psessionid']
         MyUIN = ret['result']['uin']
+        print MyUIN
         logging.critical("QQ号：{0} 登陆成功, 用户名：{1}".format(ret['result']['uin'], tmpUserName))
         logging.info('Login success')
         logging.critical("登陆二维码用时" + pass_time() + "秒")
@@ -480,123 +482,123 @@ class group_thread(threading.Thread):
     def handle(self, send_uin, content, seq):
         global administrator
         global root
+        global last1
         # 避免重复处理相同信息 
-        if seq != self.lastseq:
-            if content[:2] == './':
+        if content[:2] == './':
 
-                #主方法中包含修改权限操作
-                if content == './reload':
+            #主方法中包含修改权限操作
+            if content == './reload':
+                try:
+                    self.reply('正在编译新的指令')
+                    imp.reload(method)
+                    self.reply('成功编译完成')
+                except Exception, e:
+                    logging.critical(str(e))
+                    self.reply('指令库更新失败，请查看日志')
+
+            #重新加载方法
+
+            elif content == './selfcheck':
+                if send_uin in administrator:
+                    time_now = time.time()
+                    run_time = str(int(time_now - start))
+                    mem = psutil.virtual_memory()
+                    mem_per = str((1-(float(mem.free)/float(mem.total)))*100)+' %'
+                    cpu = str(psutil.cpu_percent())+' %'
+                    py_info = platform.python_version()
+                    plat_info = platform.platform()
+                    cpu_plt = (platform.uname())[-2]
+                    answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+mem_per+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
+                    self.reply(answer)
+                else:
+                    self.reply('权限不足')
+            #查看运行状态
+
+
+            elif './add_admin' in content:
+                if send_uin in root:
                     try:
-                        self.reply('正在编译新的指令')
-                        imp.reload(method)
-                        self.reply('成功编译完成')
-                    except Exception, e:
-                        logging.critical(str(e))
-                        self.reply('指令库更新失败，请查看日志')
+                        administrator.append(int(content.split()[1]))
+                        self.reply('添加'+str((content.split())[1])+'管理员成功！')
+                    except:
+                        logging.info('添加'+str((content.split())[1])+'失败')
+                        self.reply('添加失败，详情请查看日志')
+                else:
+                    self.reply('权限不足')
+            #添加管理员名单
 
-                #重新加载方法
-
-                elif content == './selfcheck':
-                    if send_uin in administrator:
-                        time_now = time.time()
-                        run_time = str(int(time_now - start))
-                        mem = psutil.virtual_memory()
-                        mem_per = str((1-(float(mem.free)/float(mem.total)))*100)+' %'
-                        cpu = str(psutil.cpu_percent())+' %'
-                        py_info = platform.python_version()
-                        plat_info = platform.platform()
-                        cpu_plt = (platform.uname())[-2]
-                        answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+mem_per+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
-                        self.reply(answer)
-                    else:
-                        self.reply('权限不足')
-                #查看运行状态
+            elif content.split()[0] == './root':
+                if send_uin in root:
+                    command_line = ' '.join(content.split()[1:])
+                    self.reply('宝宝为主人执行指令呢~')
+                    time.sleep(2)
+                    self.reply('指令执行完毕')
+                else:
+                    self.reply('你是谁！居然妄想操纵主人的电脑！biubiubiu~~')
 
 
-                elif './add_admin' in content:
-                    if send_uin in root:
-                        try:
-                            administrator.append(int(content.split()[1]))
-                            self.reply('添加'+str((content.split())[1])+'管理员成功！')
-                        except:
-                            logging.info('添加'+str((content.split())[1])+'失败')
-                            self.reply('添加失败，详情请查看日志')
-                    else:
-                        self.reply('权限不足')
-                #添加管理员名单
+            elif './add_root' in content:
+                if send_uin in root:
+                    try:
+                        root.append(int(content.split()[1]))
+                        administrator.append(int(content.split()[1]))
+                        self.reply('添加'+str((content.split())[1])+'root权限成功！')
+                    except:
+                        logging.info('添加'+str((content.split())[1])+'失败')
+                        self.reply('添加失败，详情请查看日志')
+                else:
+                    self.reply('权限不足')
 
-                elif content.split()[0] == './root':
-                    if send_uin in root:
-                        command_line = ' '.join(content.split()[1:])
-                        self.reply('宝宝为主人执行指令呢~')
-                        time.sleep(2)
-                        self.reply('指令执行完毕')
-                    else:
-                        self.reply('你是谁！居然妄想操纵主人的电脑！biubiubiu~~')
-
-
-                elif './add_root' in content:
-                    if send_uin in root:
-                        try:
-                            root.append(int(content.split()[1]))
-                            administrator.append(int(content.split()[1]))
-                            self.reply('添加'+str((content.split())[1])+'root权限成功！')
-                        except:
-                            logging.info('添加'+str((content.split())[1])+'失败')
-                            self.reply('添加失败，详情请查看日志')
-                    else:
-                        self.reply('权限不足')
-
-                elif './remove_admin' in content:
-                    if send_uin in root:
-                        try:
-                            administrator.remove(int(content.split()[1]))
-                            self.reply('删除'+str((content.split())[1])+'管理员权限成功！')
-                        except Exception,e:
-                            logging.info(str(e))
-                            self.reply('删除失败，详情请查看日志')
-                    else:
-                        self.reply('权限不足')
-                #添加root名单
+            elif './remove_admin' in content:
+                if send_uin in root:
+                    try:
+                        administrator.remove(int(content.split()[1]))
+                        self.reply('删除'+str((content.split())[1])+'管理员权限成功！')
+                    except Exception,e:
+                        logging.info(str(e))
+                        self.reply('删除失败，详情请查看日志')
+                else:
+                    self.reply('权限不足')
+            #添加root名单
 
 
-                elif content == './check_admins':
-                    if send_uin in administrator:
-                        administrator = list(set(administrator))
-                        answer = str(administrator)
-                        self.reply('现在管理员账号列表为：'+answer)
-                    else:
-                        self.reply('权限不足')
-                #查看管理员名单
+            elif content == './check_admins':
+                if send_uin in administrator:
+                    administrator = list(set(administrator))
+                    answer = str(administrator)
+                    self.reply('现在管理员账号列表为：'+answer)
+                else:
+                    self.reply('权限不足')
+            #查看管理员名单
 
-                elif content == './shutdown':
-                    if send_uin in root:
-                        self.reply('晚安~宝宝要睡觉惹~~')
-                        time.sleep(1)
-                        self.reply('正在保存日志')
-                        time.sleep(1)
-                        self.reply('日志保存完毕，成功退出')
+            elif content == './shutdown':
+                if send_uin in root:
+                    self.reply('晚安~宝宝要睡觉惹~~')
+                    time.sleep(1)
+                    self.reply('正在保存日志')
+                    time.sleep(1)
+                    self.reply('日志保存完毕，成功退出')
+                    exit()
+                else:
+                    self.reply('权限不足，我才不睡呢！')
+                    
+
+            else:
+                try:
+                    answer = method.main(send_uin, content, root, administrator)
+                    if answer =='主人晚安哦~么么哒~':
+                        method.save()
                         exit()
                     else:
-                        self.reply('权限不足，我才不睡呢！')
-                        
+                        self.reply(answer) 
+                except:
+                    pass   
 
-                else:
-                    try:
-                        answer = method.main(send_uin, content, root, administrator)
-                        if answer =='主人晚安哦~么么哒~':
-                            method.save()
-                            exit()
-                        else:
-                            self.reply(answer) 
-                    except:
-                        pass   
-
-            
         else:
-            logging.warning("message seq repeat detected.")
+            pass
 
-        self.lastseq = seq
+        last1 = content
+        #self.lastseq = seq
 
 
 if __name__ == "__main__":

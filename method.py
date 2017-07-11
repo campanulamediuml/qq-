@@ -26,11 +26,11 @@ bot_document = '管理员专用指令：\n./selfcheck(自检）\n./learn '+'{'+'
 
 
 def main(send_uin, content, root_name, admini):
-    global last1
     global administrator
     global root
     administrator = admini
     root = root_name
+
 
 
     pattern = re.compile(r'^(?:./|./)(learn|delete) {(.+)}{(.+)}')
@@ -61,6 +61,7 @@ def main(send_uin, content, root_name, admini):
 
 
 def command(send_uin, content):
+
     if './add_tip' in content:
         result = add_tip(send_uin,content)
                 
@@ -174,7 +175,12 @@ def command(send_uin, content):
             content = ' '.join(content[1:])
             try:
                 cu.execute(content)
-                result = '操作成功'
+                if ((content.split())[0]).lower() == 'select':
+                    count = len(cu.fetchall())
+                    result = '查询到'+str(count)+'条'
+
+                else:
+                    result = '操作成功'
             except Exception,e:
                 logging.critical(str(e))
                 result = '操作失败'
