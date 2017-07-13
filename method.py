@@ -11,6 +11,8 @@ import os
 conn = sqlite3.connect("qq_bot_database.db")
 cu = conn.cursor()
 
+rep_comment = ['ヽ(｀Д´)ﾉ','_(:з」∠)_','Σ(oﾟдﾟoﾉ)',' щ(ﾟДﾟщ)','(╬￣皿￣)=○',' (*´ﾉ皿`)'] 
+
 try:
     cu.execute("create table learn_data (id integer primary key,pid integer UNIQUE ,name varchar(140) ,content text NULL)")
 except:
@@ -74,6 +76,9 @@ def command(send_uin, content):
             result = '获取天气信息失败……'
             logging.info(result)
 
+    elif content == './智障机器人':
+        result = random.choice(rep_comment)
+
 
     elif './tips' in content:
         try:
@@ -81,9 +86,9 @@ def command(send_uin, content):
             logging.info('开始讲笑话了')
             try:
                 joke_index = int(joke_index)
-                cu.execute("select * from tips_data where id ="+str(joke_index))
+                cu.execute("select * from tips_data")
                 result = cu.fetchall()
-                result = result[0][-1]
+                result = result[int(joke_index)][-1]
             except Exception,e:
                 logging.critical(str(e))
                 cu.execute("select * from tips_data where content like '%"+str(joke_index)+"%'")
