@@ -201,8 +201,13 @@ def command(send_uin, content):
             result = '权限不足呢，只有主人才能操作SQL数据库~'
 
     elif './roll' in content:
-        result = roll(content) 
+        result = roll(content)
 
+    elif content == './license':
+        fh = open('LICENSE','r')
+        text = (fh.readlines())[0]
+        fh.close()
+        result = text
 
     else:
         content = content[2:]
