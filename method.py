@@ -7,6 +7,10 @@ import search
 import re
 import sqlite3
 import os
+import imp
+
+imp.reload(search)
+
 
 conn = sqlite3.connect("qq_bot_database.db")
 cu = conn.cursor()
@@ -68,13 +72,15 @@ def command(send_uin, content):
         result = add_tip(send_uin,content)
                 
 
-    elif content == './weather':
+    elif content[:9] == './weather':
         try:
-            result = search.get_weather()
-            result = '接下来七天，福州的天气是：\n'+result
-        except:
+            content = (content.split())[1]
+            result = search.get_weather(content)
+            result = '接下来七天，'+content+'的天气是：\n'+result
+        except Exception,e:
             result = '获取天气信息失败……'
-            logging.info(result)
+            print e
+            logging.info(str(e))
 
     elif content == './智障机器人':
         result = random.choice(rep_comment)
@@ -273,6 +279,11 @@ def learn(key, value, needreply=True):
 
     
     return result
+ 
+                                 
+def get_cpu_t():
+    res =os.popen('vcgencmd measure_temp').readline()
+    return(res.replace("temp=","").replace("'C\n","")) 
 
 def add_tip(send_uin,content):
     global joke_list

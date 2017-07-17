@@ -49,6 +49,9 @@ logging.basicConfig(filename='log.log', level=logging.DEBUG, format='%(asctime)s
 # -----------------
 # 方法声明
 # -----------------
+def getCPUtemperature():
+    res =os.popen('vcgencmd measure_temp').readline()
+    return(res.replace("temp=","").replace("'C\n",""))  
 
 
 def pass_time():
@@ -508,7 +511,7 @@ class group_thread(threading.Thread):
                     py_info = platform.python_version()
                     plat_info = platform.platform()
                     cpu_plt = (platform.uname())[-2]
-                    answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+mem_per+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)
+                    answer = '运行报告概览：\n运行时间:\n'+run_time+'秒\ncpu负载:\n'+cpu+'\n内存负载:\n'+mem_per+'\npython版本:\n'+str(py_info)+'\n运行环境:\n'+str(plat_info)+'\nCPU架构:\n'+str(cpu_plt)+'\n设备核心温度:\n'+str(getCPUtemperature())
                     self.reply(answer)
                 else:
                     self.reply('权限不足')
