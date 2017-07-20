@@ -53,4 +53,12 @@ def get_weather(place):
     #print result
     return result
 
+
+def translate(keyword):
+    url = 'https://www.youdao.com/w/eng/'+str(keyword)+'/#keyfrom=dict2.index'
+    page_html = get_htmlsoup(url)
+    return page_html.find(class_="trans-container").get_text().strip()
+    
+
+
 #print get_weather('福州')

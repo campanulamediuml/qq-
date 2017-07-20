@@ -149,6 +149,13 @@ def command(send_uin, content):
                 logging.error("ERROR:"+str(e))
         else:
             result = '宝宝才不会删除这些信息呢！只有主人可以~'
+
+    elif content[:6] == './dict':
+        try:
+            content = content.split()[1]
+            result = search.translate(content)
+        except:
+            result = '哎呀呀找不到这个词的意思诶'
      
 
     elif content == './check':
