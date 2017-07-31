@@ -15,7 +15,7 @@ imp.reload(search)
 conn = sqlite3.connect("qq_bot_database.db")
 cu = conn.cursor()
 
-rep_comment = ['ヽ(｀Д´)ﾉ','_(:з」∠)_','Σ(oﾟдﾟoﾉ)',' щ(ﾟДﾟщ)','(╬￣皿￣)=○',' (*´ﾉ皿`)'] 
+rep_comment = ['ヽ(｀Д´)ﾉ','_(:з」∠)_','Σ(oﾟдﾟoﾉ)',' щ(ﾟДﾟщ)','(╬￣皿￣)=○',' (*´ﾉ皿`)','(￣^￣)ゞ','!!!∑(°Д°ノ)ノ','(▼皿▼#)','٩(˃̶͈̀௰˂̶͈́)و','╮（╯＿╰）╭','你才智障呢！口亨~'] 
 
 try:
     cu.execute("create table learn_data (id integer primary key,pid integer UNIQUE ,name varchar(140) ,content text NULL)")
