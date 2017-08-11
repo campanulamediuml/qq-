@@ -8,6 +8,7 @@ import re
 import sqlite3
 import os
 import imp
+import jieba
 
 imp.reload(search)
 
@@ -138,6 +139,12 @@ def command(send_uin, content):
         else:
             result = '权限不足呢~宝宝不告诉你'
 
+    elif content.split()[0] == './cut':
+        sentence = ''.join(content.split()[1:])
+        seg_list = jieba.cut(sentence)  # 默认是精确模式
+        result =  ", ".join(seg_list)
+        
+
  
     elif content == './deleteall':
         if send_uin in root:
@@ -166,6 +173,12 @@ def command(send_uin, content):
             result = '报告，宝宝学会了'+str(count)+'条知识，快夸我~'
         else:
             result ='只有主人和主人的小伙伴可以看宝宝学了多少知识呢~'
+
+    elif './ask' in content:
+        fh = open('name.txt')
+        result_list = fh.readlines()
+        result = random.choice(result_list)
+        fh.close()
 
 
     elif content == './greeting':
