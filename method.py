@@ -15,8 +15,28 @@ from multiprocessing.dummy import Pool as ThreadPool
 imp.reload(search)
 
 
+
 conn = sqlite3.connect("qq_bot_database.db")
 cu = conn.cursor()
+cu.execute("DELETE FROM learn_data WHERE content LIKE '%找不到这个知识呀%'")
+conn.commit()
+
+def reset_database():
+    cu.execute("SELECT * FROM learn_data")
+    result = cu.fetchall()
+    tmp = []
+    for i in result:
+        tmp.append(i[2:])
+
+    tmp = list(set(tmp))
+
+    cu.execute("DELETE FROM learn_data")
+    for line in tmp:
+        cu.execute('INSERT INTO learn_data(name,content) VALUES(?,?)',line)
+    conn.commit()
+
+
+
 
 rep_comment = ['ヽ(｀Д´)ﾉ','_(:з」∠)_','Σ(oﾟдﾟoﾉ)',' щ(ﾟДﾟщ)','(╬￣皿￣)=○',' (*´ﾉ皿`)','(￣^￣)ゞ','!!!∑(°Д°ノ)ノ','(▼皿▼#)','٩(˃̶͈̀௰˂̶͈́)و','╮（╯＿╰）╭','你才智障呢！口亨~'] 
 
@@ -231,12 +251,24 @@ def command(send_uin, content):
         fh.close()
         result = text
 
+    elif content == './reset_db':
+        if send_uin in root:
+            reset_database()
+            result = '重置数据库成功'
+        else:
+            result = '权限不足诶~'
+
+
     elif './explain' in content:
-        content = content.split()[1]
-        cu.execute("select * from learn_data where name ='"+i+"'")
-        tmp = cu.fetchall()
-        answer = str((random.choice(tmp))[-1])
-        result = answer
+        try:
+            content = content.split()[1]
+            cu.execute("select * from learn_data where name ='"+content+"'")
+            tmp = cu.fetchall()
+            answer = str((random.choice(tmp))[-1])
+            result = answer
+        except Exception,e:
+            print e 
+            result = '数据库中没有找到对应内容'
 
 
     else:
@@ -276,8 +308,10 @@ def command(send_uin, content):
             try:
                 answer = pool.map(search_nlg,search_item)
                 answer = random.choice(answer)
+
             except:
                 pass
+            pool.close()
             result = str(answer)
     
     return result
@@ -326,18 +360,22 @@ def learn(key, value, needreply=True):
         result_index = list(set(result_index))#去重
 
         t_list = []
-        t = key.split(',') #把关检测根据逗号切割
+        t = key.split(',')+[key] #把关检测根据逗号切割
         for i in t:
             t_list.append((i.decode('utf-8'),value.decode('utf-8')))
-        t_list.append(key)
+        
         t_list = list(set(t_list))
 
+        for t in t_list:
+            print t
         if value not in result_index:
             for t in t_list:
-                cu.execute("insert into learn_data (name,content)  values(?,?)", t)
+                print t
+                cu.execute("insert into learn_data(name,content)  values(?,?)", t)
         conn.commit()
         result = ("宝宝学会“" + str(key) + "”了~") 
     except Exception,e:
+        print e
         logging.critical('ERROR'+str(e))
 
     
