@@ -9,6 +9,8 @@ import sqlite3
 import os
 import imp
 import jieba
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool 
 
 imp.reload(search)
 
@@ -229,21 +231,51 @@ def command(send_uin, content):
         fh.close()
         result = text
 
+    elif './explain' in content:
+        content = content.split()[1]
+        cu.execute("select * from learn_data where name ='"+i+"'")
+        tmp = cu.fetchall()
+        answer = str((random.choice(tmp))[-1])
+        result = answer
+
+
     else:
         content = content[2:]
+
+        search_kw = content
         print content
+        content = jieba.cut(content)
+        print type(content)
+        #先对问题进行分词处理
+        content = (','.join(content)).split(',')
+        
         try:
-            cu.execute("select * from learn_data where name like'%"+content+"%'")
-            answer = cu.fetchall()
-            answer = (random.choice(answer))[-1]
+            all_answer = []
+            for i in content:
+                cu.execute("select * from learn_data where name ='"+i+"'")
+                tmp = cu.fetchall()
+                for j in tmp:
+                    all_answer.append(j)
+
+
+            answer = str((random.choice(all_answer))[-1])
             result = answer
+            
+            
         except Exception, e:
+            print str(e)
             answer = '宝宝的知识库里没有这条知识呀'
             logging.error("ERROR:"+str(e))
             pass
         if answer == '宝宝的知识库里没有这条知识呀':
+            content = content+[search_kw]+search_kw.split(u'，')
+            search_item = []
+            for i in content:
+                search_item.append('./search '+i)
+            pool = Pool()
             try:
-                answer = search_nlg('./search '+content)
+                answer = pool.map(search_nlg,search_item)
+                answer = random.choice(answer)
             except:
                 pass
             result = str(answer)
@@ -290,13 +322,19 @@ def learn(key, value, needreply=True):
         for i in result:
             result_index.append(i[3:])
             print i[3:]  
-            print i      
-        result_index = list(set(result_index))
+            print i  #切割关键词    
+        result_index = list(set(result_index))#去重
 
-        t = (key.decode('utf-8'),value.decode('utf-8'))
-        print t
+        t_list = []
+        t = key.split(',') #把关检测根据逗号切割
+        for i in t:
+            t_list.append((i.decode('utf-8'),value.decode('utf-8')))
+        t_list.append(key)
+        t_list = list(set(t_list))
+
         if value not in result_index:
-            cu.execute("insert into learn_data (name,content)  values(?,?)", t)
+            for t in t_list:
+                cu.execute("insert into learn_data (name,content)  values(?,?)", t)
         conn.commit()
         result = ("宝宝学会“" + str(key) + "”了~") 
     except Exception,e:
