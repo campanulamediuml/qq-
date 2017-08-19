@@ -31,10 +31,12 @@ def reset_database():
     tmp = list(set(tmp))
 
     cu.execute("DELETE FROM learn_data")
+    conn.commit()
     for line in tmp:
         cu.execute('INSERT INTO learn_data(name,content) VALUES(?,?)',line)
     conn.commit()
 
+reset_database()
 
 
 
@@ -224,8 +226,7 @@ def command(send_uin, content):
 
     elif './executesql' in content:
         if send_uin in root:
-            content = content.split()
-            content = ' '.join(content[1:])
+            content = content[13:]
             try:
                 cu.execute(content)
                 if ((content.split())[0]).lower() == 'select':
@@ -233,8 +234,11 @@ def command(send_uin, content):
                     result = '查询到'+str(count)+'条'
 
                 else:
+                    conn.commit()
                     result = '操作成功'
+
             except Exception,e:
+                print e
                 logging.critical(str(e))
                 result = '操作失败'
                 print result
@@ -280,7 +284,8 @@ def command(send_uin, content):
         print type(content)
         #先对问题进行分词处理
         content = (','.join(content)).split(',')
-        
+        roll_point = random.randint(1,100)
+        print roll_point
         try:
             all_answer = []
             for i in content:
@@ -289,9 +294,18 @@ def command(send_uin, content):
                 for j in tmp:
                     all_answer.append(j)
 
-
-            answer = str((random.choice(all_answer))[-1])
-            result = answer
+            cu.execute("select * from learn_data where name ='"+search_kw+"'")
+            tmp = cu.fetchall()
+            if len(tmp) == 0:
+                answer = str((random.choice(all_answer))[-1])
+                result = answer
+            else:
+                if roll_point > 80:
+                    answer = str((random.choice(all_answer))[-1])
+                    result = answer
+                else:
+                    answer = str((random.choice(tmp))[-1])
+                    result = answer
             
             
         except Exception, e:
@@ -299,6 +313,8 @@ def command(send_uin, content):
             answer = '宝宝的知识库里没有这条知识呀'
             logging.error("ERROR:"+str(e))
             pass
+
+
         if answer == '宝宝的知识库里没有这条知识呀':
             content = content+[search_kw]+search_kw.split(u'，')
             search_item = []
