@@ -406,7 +406,7 @@ def add_tip(send_uin,content):
     global joke_list
     if './add_tip' in content:
         if send_uin in administrator:
-            cu.execute("insert into tips_data (content) values(?)",((content.split()[1]),))
+            cu.execute("insert into tips_data (content) values(?)",((' '.join(content.split()[1])),))
             result = '该tip成功写入数据库'
             conn.commit()
         else:
